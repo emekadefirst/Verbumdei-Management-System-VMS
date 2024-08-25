@@ -14,7 +14,7 @@ adminv2.
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-DEBUG = True
+DEBUG = False
 
 INSTALLED_APPS = [
     "unfold",
@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'import_export',
     'rest_framework',
+    "corsheaders",
     # installed Apps
     'staff',
     'student',
