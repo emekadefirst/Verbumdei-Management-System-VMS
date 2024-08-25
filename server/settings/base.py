@@ -41,6 +41,8 @@ INSTALLED_APPS = [
 
 ROOT_URLCONF = 'server.urls'
 
+WSGI_APPLICATION = 'server.wsgi.application'
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',

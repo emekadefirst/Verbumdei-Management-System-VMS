@@ -30,4 +30,3 @@ DATABASES = {
 }
 
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-WSGI_APPLICATION = 'server.wsgi.application'
