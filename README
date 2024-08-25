@@ -1,0 +1,4 @@
+### VERBUMDEI MANAGEMENT SERVICE
+
+        --Using waitress to runserver
+        waitress-serve --listen=*:8000 server.server.wsgi:application
