@@ -15,10 +15,6 @@ DATABASES = {
     }
 }
 
-# CORS_ALLOWED_ORIGINS = ['*']
-CORS_ALLOWED_ORIGIN_REGEXES = [
-    r"^https://\w+\.example\.com$",
-]
 CORS_ALLOW_ALL_ORIGINS: True
 
 CORS_ALLOW_METHODS = (
