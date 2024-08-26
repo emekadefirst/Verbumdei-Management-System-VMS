@@ -121,5 +121,14 @@ UNFOLD = {
             "900": "0 0 51",
             "950": "0 0 25"
         }
-}
+},
+
+"SITE_FAVICONS": [
+        {
+            "rel": "icon",
+            "sizes": "32x32",
+            "type": "image/png",
+            "href": lambda request: static("logo.jpeg"),
+        },
+    ],
 }

@@ -1,35 +1,45 @@
-# import os
-# from google.oauth2 import service_account
-# from googleapiclient.discovery import build
-# from googleapiclient.http import MediaFileUpload
+from django.db.models import Count, Sum
+from django.db.models.functions import TruncDay
+from django.utils import timezone
+from datetime import timedelta
+import json
+from student.models import Student
+from staff.models import Staff
+from Payment.models import Payment
 
-# # Define your credentials and scope
-# SCOPES = ['https://www.googleapis.com/auth/drive.file']
+def dashboard_callback(request, context):
+    # Basic counts
+    context.update({
+        "total_staff": Staff.objects.count(),
+        "total_student": Student.objects.count(),
+        "total_payment": Payment.objects.aggregate(total_amount=Sum('amount'))['total_amount'] or 0,
+    })
 
-# def get_drive_service():
-#     """Authenticate and return the Google Drive service."""
-#     credentials = service_account.Credentials.from_service_account_file(
-#         'path/to/your/service-account-key.json', scopes=SCOPES)
-#     service = build('drive', 'v3', credentials=credentials)
-#     return service
+    # Prepare data for charts
+    last_7_days = timezone.now() - timedelta(days=7)
 
-# def cloud_storege(instance, filename):
-#     """ Implement a cloud storage solution using Google Drive. This function should perform the following tasks:
-#     1. Upload a local file to the Google Drive.
-#     2. Download a file from the Google Drive to a local directory.
-#     3. Delete a file from the Google Drive.
-#     """
-#     """Uploads a file to Google Drive and returns the file's public URL."""
-#     service = get_drive_service()
-#     file_path = os.path.join('media', filename)
-#     file_metadata = {'name': filename}
-#     media = MediaFileUpload(file_path, resumable=True)
-#     file = service.files().create(body=file_metadata, media_body=media, fields='id').execute()
-#     file_id = file.get('id')
-#     service.permissions().create(
-#         fileId=file_id,
-#         body={'type': 'anyone', 'role': 'reader'}
-#     ).execute()
-#     file_url = f"https://drive.google.com/uc?id={file_id}&export=download"
-#     return file_url
+    # Total payments in the last 7 days
+    payments_last_7_days = Payment.objects.filter(created_at__gte=last_7_days)\
+        .annotate(day=TruncDay('created_at'))\
+        .values('day')\
+        .annotate(total_amount=Sum('amount'))\
+        .order_by('day')
 
+    context['payments_last_7_days'] = json.dumps(
+        [{'date': item['day'].strftime('%Y-%m-%d'), 'amount': item['total_amount']} for item in payments_last_7_days]
+    )
+
+    # Student Registration Analytics
+    # Example: Count students created in the last 30 days
+    thirty_days_ago = timezone.now() - timedelta(days=30)
+    student_registration_stats = Student.objects.filter(created_at__gte=thirty_days_ago)\
+        .annotate(day=TruncDay('created_at'))\
+        .values('day')\
+        .annotate(count=Count('id'))\
+        .order_by('day')
+
+    context['student_registration_graph_data'] = json.dumps(
+        [{'date': item['day'].strftime('%Y-%m-%d'), 'count': item['count']} for item in student_registration_stats]
+    )
+
+    return context

@@ -1,0 +1,59 @@
+{% load i18n log %}
+
+{% get_admin_log 10 as admin_log for_user user %}
+
+{% if admin_log %}
+<div class="w-full overflow-x-auto">
+    <table class="min-w-full bg-white dark:bg-gray-800 rounded-lg overflow-hidden">
+        <thead class="bg-gray-100 dark:bg-gray-700">
+            <tr>
+                <th
+                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
+                    {% translate 'Action' %}
+                </th>
+                <th
+                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
+                    {% translate 'Content' %}
+                </th>
+                <th
+                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
+                    {% translate 'Time' %}
+                </th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+            {% for entry in admin_log %}
+            <tr
+                class="{% if forloop.counter|divisibleby:2 %}bg-gray-50 dark:bg-gray-900{% else %}bg-white dark:bg-gray-800{% endif %}">
+                <td class="px-4 py-4 whitespace-nowrap">
+                    <span
+                        class="{% if entry.is_addition %}text-green-600{% elif entry.is_change %}text-blue-600{% elif entry.is_deletion %}text-red-600{% endif %} font-medium">
+                        {% if entry.is_addition %}{% translate 'Added' %}
+                        {% elif entry.is_change %}{% translate 'Changed' %}
+                        {% elif entry.is_deletion %}{% translate 'Deleted' %}
+                        {% endif %}
+                    </span>
+                    <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                        {% if entry.is_deletion or not entry.get_admin_url %}
+                        {{ entry.object_repr }}
+                        {% else %}
+                        <a href="{{ entry.get_admin_url }}" class="hover:underline">{{ entry.object_repr }}</a>
+                        {% endif %}
+                    </span>
+                </td>
+                <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                    {% if entry.content_type %}
+                    {% filter capfirst %}{{ entry.content_type.name }}{% endfilter %}
+                    {% else %}
+                    {% translate 'Unknown content' %}
+                    {% endif %}
+                </td>
+                <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                    {{ entry.action_time }}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}

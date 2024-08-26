@@ -1,0 +1,149 @@
+{% extends 'unfold/layouts/base.html' %}
+
+{% load i18n unfold %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<div
+    style="text-align: center; max-width: 1140px; margin-left: auto; margin-right: auto; padding: 20px; border: 1px solid #ccc; border-radius: 10px;">
+    <!-- Time Range Selector -->
+    <div style="margin-bottom: 20px;">
+        <button onclick="updateChart('7days')">Last 7 Days</button>
+        <button onclick="updateChart('month')">Last Month</button>
+        <button onclick="updateChart('year')">Last Year</button>
+        <button onclick="updateChart('all')">All Time</button>
+    </div>
+    <!-- Charts -->
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+        <div style="padding: 15px; border: 1px solid #ddd; border-radius: 5px;">
+            <h3>Payments Analytics</h3>
+            <canvas id="paymentTimeChart"></canvas>
+        </div>
+        <div style="padding: 15px; border: 1px solid #ddd; border-radius: 5px;">
+            <h3>Student Registration Analytics</h3>
+            <canvas id="studentChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<div
+    style="text-align: center; max-width: 1140px; margin-left: auto; margin-right: auto; padding: 20px; border: 1px solid #ccc; border-radius: 10px;">
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+        <div style="padding: 15px; border: 1px solid #ddd; border-radius: 5px;">
+            <h3>Student count</h3>
+            <ul style="list-style-type: none; padding: 0;">
+                {% for blog in top_liked_blogs %}
+                <li>{{ blog.title }} - {{ blog.like_count }} likes</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div style="padding: 15px; border: 1px solid #ddd; border-radius: 5px;">
+            <h3>Total Statistics</h3>
+            <p>Total Number of staff: {{ total_staff|default:0 }}</p>
+            <p>Total Payments: {{ total_payments|default:0 }}</p>
+        </div>
+    </div>
+</div>
+<div class="card mt-8">
+    {% include "unfold/helpers/history.html" %}
+</div>
+<script>
+    const COLORS = {
+        primary: {
+            "50": "rgba(235, 245, 255, 1)",
+            "100": "rgba(215, 235, 255, 1)",
+            "200": "rgba(176, 215, 255, 1)",
+            "300": "rgba(137, 195, 255, 1)",
+            "400": "rgba(98, 175, 255, 1)",
+            "500": "rgba(0, 0, 255, 1)",
+            "600": "rgba(0, 0, 204, 1)",
+            "700": "rgba(0, 0, 153, 1)",
+            "800": "rgba(0, 0, 102, 1)",
+            "900": "rgba(0, 0, 51, 1)",
+            "950": "rgba(0, 0, 25, 1)"
+        }
+    };
+
+    // Payment Time Chart
+    var ctxPayment = document.getElementById('paymentTimeChart').getContext('2d');
+    var paymentData = JSON.parse('{{ payments_last_7_days|default:"[]"|safe }}');
+    const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const paymentAmounts = Array(7).fill(0);
+
+    paymentData.forEach(item => {
+        const date = new Date(item.date);
+        const dayIndex = date.getDay();
+        paymentAmounts[dayIndex] += item.amount;
+    });
+
+    new Chart(ctxPayment, {
+        type: 'bar',
+        data: {
+            labels: daysOfWeek,
+            datasets: [{
+                label: 'Total Payment Amount',
+                data: paymentAmounts,
+                borderColor: COLORS.primary["500"],
+                backgroundColor: COLORS.primary["300"],
+                borderWidth: 1,
+                fill: true,
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: COLORS.primary["700"]
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: { color: COLORS.primary["700"] }
+                },
+                y: {
+                    ticks: { color: COLORS.primary["700"] }
+                }
+            }
+        }
+    });
+
+    // Student Registration Chart
+    var ctxStudent = document.getElementById('studentChart').getContext('2d');
+    var studentData = JSON.parse('{{ student_registration_graph_data|default:"[]"|safe }}');
+
+    new Chart(ctxStudent, {
+        type: 'line',
+        data: {
+            labels: studentData.map(item => item.date),
+            datasets: [{
+                label: 'Number of Students',
+                data: studentData.map(item => item.count),
+                backgroundColor: COLORS.primary["300"],
+                borderColor: COLORS.primary["500"],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                title: {
+                    display: true,
+                    text: 'Student Registration Analytics',
+                    color: COLORS.primary["600"]
+                }
+            },
+            scales: {
+                y: { beginAtZero: true, ticks: { color: COLORS.primary["700"] } },
+                x: { ticks: { color: COLORS.primary["700"] } }
+            }
+        }
+    });
+</script>
+{% endblock %}

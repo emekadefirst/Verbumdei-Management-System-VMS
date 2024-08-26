@@ -1,0 +1,71 @@
+{% extends 'admin/base.html' %}
+
+{% load i18n %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block title %}
+{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | {{ site_title|default:_('Verbumdei site admin') }}
+{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">
+    <a href="{% url 'admin:index' %}">
+        {{ site_header|default:_('Django administration') }}
+    </a>
+</h1>
+{% endblock %}
+
+{% block content %}
+<div class="flex flex-col lg:flex-row lg:gap-8">
+    <div class="flex-grow">
+        <!-- First Chart -->
+        <canvas id="mixedChart1"></canvas>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial"></script>
+        <script>
+            const ctx1 = document.getElementById('mixedChart1').getContext('2d');
+            const mixedChart1 = new Chart(ctx1, {
+                data: {
+                    datasets: [{
+                        type: 'line',
+                        label: 'Line Dataset',
+                        data: [10, 20, 30, 40]
+                    }, {
+                        type: 'line',
+                        label: 'Line Dataset',
+                        data: [50, 50, 50, 50],
+                    }],
+                    labels: ['January', 'February', 'March', 'April']
+                },
+                options: {}
+            });
+        </script>
+
+        <!-- Second Chart -->
+        <canvas id="mixedChart2"></canvas>
+        <script>
+            const ctx2 = document.getElementById('mixedChart2').getContext('2d');
+            const mixedChart2 = new Chart(ctx2, {
+                data: {
+                    datasets: [{
+
+                        label: 'Line Dataset',
+                        data: [10, 20, 30, 40]
+                    }, {
+                        type: 'bar',
+                        label: 'Bar Dataset',
+                        data: [50, 50, 50, 50],
+                    }],
+                    labels: ['January', 'February', 'March', 'April']
+                },
+                options: {}
+            });
+        </script>
+
+        {% include "unfold/helpers/app_list_default.html" %}
+    </div>
+
+    {% include "unfold/helpers/history.html" %}
+</div>
+{% endblock %}
