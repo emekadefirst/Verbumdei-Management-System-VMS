@@ -34,10 +34,10 @@ INSTALLED_APPS = [
     'parent',
     'program',
     'grade',
-    'Payment',
     'asessment',
     'inventory',
     'subadmins',
+    'payment',
     ]
 
 ROOT_URLCONF = 'server.urls'

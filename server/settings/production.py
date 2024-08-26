@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 SECRET_KEY = os.environ.get('PRODUCTION_KEY')
+
 ALLOWED_HOSTS = ['*']
 
 MIDDLEWARE = [
@@ -21,13 +22,15 @@ MIDDLEWARE = [
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DATABASE_NAME'),
-        'USER': os.environ.get('DATABASE_USER'),
-        'PASSWORD': os.environ.get('DATABASE_PASSWORD'),
-        'HOST': os.environ.get('DATABASE_HOST'),
-        'OPTIONS': {'sslmode': os.environ.get('DATABASE_SSLMODE')},
+        'NAME': os.environ.get('DB_NAME'),
+        'USER': os.environ.get('DB_USER'),
+        'PASSWORD': os.environ.get('DB_PASSWORD'),
+        'HOST': 'ep-white-cloud-a263j95h.eu-central-1.pg.koyeb.app',
+        'OPTIONS': {'sslmode': os.environ.get('DB_SSLMODE')},
     }
 }
+
+
 
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 

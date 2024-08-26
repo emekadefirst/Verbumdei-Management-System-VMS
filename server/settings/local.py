@@ -5,6 +5,7 @@ load_dotenv()
 
 SECRET_KEY = os.environ.get('LOCAL_KEY')
 
+
 ALLOWED_HOSTS = []
 
 DATABASES = {
@@ -14,7 +15,7 @@ DATABASES = {
     }
 }
 
-CORS_ALLOWED_ORIGINS = ['*']
+# CORS_ALLOWED_ORIGINS = ['*']
 CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^https://\w+\.example\.com$",
 ]

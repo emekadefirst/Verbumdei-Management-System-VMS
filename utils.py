@@ -5,7 +5,7 @@ from datetime import timedelta
 import json
 from student.models import Student
 from staff.models import Staff
-from Payment.models import Payment
+from payment.models import Payment
 
 def dashboard_callback(request, context):
     # Basic counts
