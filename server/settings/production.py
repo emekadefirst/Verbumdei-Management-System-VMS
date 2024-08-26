@@ -4,7 +4,6 @@ from dotenv import load_dotenv
 load_dotenv()
 
 SECRET_KEY = os.environ.get('PRODUCTION_KEY')
-#SECRET_KEY = 'ph!_9x@%z)0sc5hys^(^!3182iyo(e$(7g@k4-s@)vf$4p*5'
 ALLOWED_HOSTS = ['*']
 
 MIDDLEWARE = [
