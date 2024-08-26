@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'asessment',
     'inventory',
     'subadmins',
-    'payment',
+
     ]
 
 ROOT_URLCONF = 'server.urls'
