@@ -9,9 +9,9 @@ SECRET_KEY = os.environ.get('LOCAL_KEY')
 ALLOWED_HOSTS = []
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'verbumdeiMS.db',
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "verbumdeiMS.db",
     }
 }
 
