@@ -20,5 +20,9 @@ class Payment(models.Model):
     payment_type = models.ForeignKey(PaymentType, on_delete=models.CASCADE)
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     method = models.CharField(max_length=20, choices=PAYMENT_METHOD.choices)
-    status = models.CharField(max_length=12)
+    status = models.CharField(max_length=12, default="processing")
+    reference = models.CharField(max_length=100, unique=True, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.student} - {self.payment_type} - {self.reference}"

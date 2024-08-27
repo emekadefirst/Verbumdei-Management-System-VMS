@@ -18,12 +18,13 @@ class PaymentTypeAdmin(ModelAdmin, ImportExportModelAdmin):
 
 @admin.register(Payment)
 class PaymentAdmin(ModelAdmin, ImportExportModelAdmin):
-    list_display = ["payment_type", "student", "method", "status", "created_at"]
+    list_display = ["payment_type", "student", "method", "status", "reference", "created_at"]
     search_fields = [
         "payment_type__name",
         "student__first_name",
         "student__last_name",
         "status",
+        "reference",
     ]
     list_filter = ["method", "status", "created_at"]
     ordering = ["-created_at"]

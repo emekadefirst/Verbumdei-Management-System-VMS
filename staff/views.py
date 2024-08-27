@@ -3,8 +3,11 @@ from rest_framework import status
 from datetime import datetime
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.db.models import Q
+from django.db.models.functions import Lower
 from .models import Staff, AccountInfo, Payroll
 from .serializers import StaffSerializer, AccountInfoSerializer, PayrollSerializer
+
 
 class StaffListCreateAPIView(APIView):
     def get(self, request, format=None):
@@ -18,6 +21,7 @@ class StaffListCreateAPIView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class StaffDetailAPIView(APIView):
     def get_object(self, pk):
@@ -39,17 +43,18 @@ class StaffDetailAPIView(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class AccountCountView(APIView):
     def get(self, request, format=None):
         count = AccountInfo.objects.count()
         return Response({"count": count})
+
 
 class AccountInfoListCreateAPIView(APIView):
     def get(self, request, format=None):
         account_info = AccountInfo.objects.all()
         serializer = AccountInfoSerializer(account_info, many=True)
         return Response(serializer.data)
-    
 
     def post(self, request, format=None):
         serializer = AccountInfoSerializer(data=request.data)
@@ -57,6 +62,7 @@ class AccountInfoListCreateAPIView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class AccountInfoDetailAPIView(APIView):
     def get_object(self, pk):
@@ -78,6 +84,7 @@ class AccountInfoDetailAPIView(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class PayrollListCreateAPIView(APIView):
     def get(self, request, format=None):
         payroll = Payroll.objects.all()
@@ -90,6 +97,7 @@ class PayrollListCreateAPIView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class PayrollDetailAPIView(APIView):
     def get_object(self, pk):
@@ -114,10 +122,31 @@ class PayrollDetailAPIView(APIView):
 
 class PayrollExportAPIView(APIView):
     def get(self, request, pay_period, format=None):
-        response = Payroll.export_to_csv(datetime.strptime(pay_period, '%Y-%m-%d'))
+        response = Payroll.export_to_csv(datetime.strptime(pay_period, "%Y-%m-%d"))
         return response
+
 
 class StaffCountView(APIView):
     def get(self, request, format=None):
         count = Staff.objects.count()
         return Response({"count": count})
+
+
+class StaffSearch(APIView):
+    def post(self, request):
+        search_query = request.data.get("query", "")
+        if search_query:
+            search_results = Staff.objects.filter(
+                Q(name__icontains=search_query)
+                | Q(staff_registration_id__icontains=search_query)
+                | Q(first_name__icontains=search_query)
+                | Q(other_name__icontains=search_query)
+                | Q(last_name__icontains=search_query)
+            )
+
+            search_results = search_results.order_by("staff_registration_id")
+            serializer = StaffSerializer(search_results, many=True)
+            print(f"Search results: {serializer.data}")
+            return Response(serializer.data)
+        else:
+            return Response("Invalid search query", status=status.HTTP_400_BAD_REQUEST)

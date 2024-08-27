@@ -21,17 +21,21 @@ schema_view = get_schema_view(
 
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    re_path(r'^$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-    re_path(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
-    path('staff/', include('staff.urls')),
-    path('student/', include('student.urls')),
-    path('program/', include('program.urls')),
-    path('inventory/', include('inventory.urls')),
-    path('parent/', include('parent.urls')),
-    path('class/', include('grade.urls')),
-    path('sub-admin/', include('subadmins.urls')),
+    path("admin/", admin.site.urls),
+    re_path(
+        r"^$", schema_view.with_ui("swagger", cache_timeout=0), name="schema-swagger-ui"
+    ),
+    re_path(
+        r"^redoc/$", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"
+    ),
+    path("staff/", include("staff.urls")),
+    path("student/", include("student.urls")),
+    path("program/", include("program.urls")),
+    path("inventory/", include("inventory.urls")),
+    path("parent/", include("parent.urls")),
+    path("class/", include("grade.urls")),
+    path("payment/", include("payment.urls")),
+    path("sub-admin/", include("subadmins.urls")),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
