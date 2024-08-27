@@ -4,7 +4,7 @@ from .models import Parent
 class ParentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Parent
-        field = '__all__'
+        fields = '__all__'
         
     def create(self, validated_data):
         parent = Parent.objects.create(**validated_data)
