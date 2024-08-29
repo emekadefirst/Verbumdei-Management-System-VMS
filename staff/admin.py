@@ -26,22 +26,33 @@ class AccountInfoAdmin(ModelAdmin, ImportExportModelAdmin):
     import_form_class = ImportForm
     export_form_class = SelectableFieldsExportForm
 
+
 @admin.register(Payroll)
 class PayrollAdmin(ModelAdmin, ImportExportModelAdmin):
-    list_display = ('staff', 'pay_period', 'net_pay', 'payment_status', 'payment_date')
-    search_fields = ('staff__staff_id', 'staff__first_name', 'staff__last_name', 'transaction_reference')
-    list_filter = ('payment_status', 'pay_period', 'created_at', 'updated_at')
-    ordering = ('-pay_period', 'staff__last_name')
-    readonly_fields = ('net_pay', 'transaction_reference', 'created_at', 'updated_at')
+    list_display = ("staff", "pay_period", "net_pay", "payment_status", "payment_date")
+    search_fields = (
+        "staff__staff_id",
+        "staff__first_name",
+        "staff__last_name",
+        "transaction_reference",
+    )
+    list_filter = ("payment_status", "pay_period", "created_at", "updated_at")
+    ordering = ("-pay_period", "staff__last_name")
+    readonly_fields = (
+        "transaction_reference",
+        "created_at",
+        "updated_at",
+        "net_pay",
+    )  # Make net_pay readonly
     import_form_class = ImportForm
     export_form_class = SelectableFieldsExportForm
-    
-    def save_model(self, request, obj, form, change):
-        if not obj.transaction_reference:
-            obj.generate_transaction_reference()
-        super().save_model(request, obj, form, change)
-    
-    def get_queryset(self, request):
-        queryset = super().get_queryset(request)
-        queryset = queryset.select_related('staff', 'account_info')
-        return queryset
+
+    # def save_model(self, request, obj, form, change):
+    #     if not obj.transaction_reference:
+    #         obj.generate_transaction_reference()
+    #     super().save_model(request, obj, form, change)
+
+    # def get_queryset(self, request):
+    #     queryset = super().get_queryset(request)
+    #     queryset = queryset.select_related('staff', 'account_info')
+    #     return queryset

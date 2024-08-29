@@ -18,33 +18,39 @@ class PaymentTypeSerializer(serializers.ModelSerializer):
 
 
 class PaymentSerializers(serializers.ModelSerializer):
-    payment_type = PaymentTypeSerializer()
-    student = StudentSerializer()
-
     class Meta:
         model = Payment
         fields = [
-            "id",
+            "parent",
             "payment_type",
             "student",
             "method",
-            "status",
-            "reference",
             "created_at",
+            "cost",  # Include cost field here
         ]
 
     def create(self, validated_data):
-        reference = validated_data.pop("reference", None)
-        payment_type_data = validated_data.pop("payment_type")
-        student_data = validated_data.pop("student")
-
-        payment_type = PaymentType.objects.get(**payment_type_data)
-        student = Student.objects.get(**student_data)
-
+        payment_type = validated_data.get("payment_type")
+        student = validated_data.get("student")
+        method = validated_data.get("method")
+        cost = payment_type.cost
         payment = Payment.objects.create(
             payment_type=payment_type,
             student=student,
-            reference=reference,
-            **validated_data
+            method=method,
+            cost=cost,  # Save the cost here
         )
+
         return payment
+
+    def update(self, instance, validated_data):
+        instance.payment_type = validated_data.get(
+            "payment_type", instance.payment_type
+        )
+        instance.student = validated_data.get("student", instance.student)
+        instance.method = validated_data.get("method", instance.method)
+        if "payment_type" in validated_data:
+            instance.cost = instance.payment_type.cost
+
+        instance.save()
+        return instance

@@ -1,5 +1,6 @@
 from django.db import models
 from student.models import Student
+from parent.models import Parent
 
 
 class PaymentType(models.Model):
@@ -17,6 +18,7 @@ class Payment(models.Model):
         POS = "POS", "Point of Sale"
 
     id = models.AutoField(primary_key=True)
+    parent = models.ForeignKey(Parent, on_delete=models.CASCADE)
     payment_type = models.ForeignKey(PaymentType, on_delete=models.CASCADE)
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     method = models.CharField(max_length=20, choices=PAYMENT_METHOD.choices)

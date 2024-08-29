@@ -75,6 +75,7 @@ class AccountInfo(models.Model):
     def __str__(self):
         return f"{self.staff.staff_id} - {self.bank_name} - {self.account_number}"
 
+
 class Payroll(models.Model):
     class PaymentStatus(models.TextChoices):
         PENDING = "PENDING", "Pending"
@@ -82,69 +83,48 @@ class Payroll(models.Model):
         PAID = "PAID", "Paid"
 
     id = models.AutoField(primary_key=True)
-    staff = models.ForeignKey(Staff, on_delete=models.SET_NULL, null=True, related_name='payrolls')
-    pay_period = models.DateField() 
+    staff = models.ForeignKey(
+        Staff, on_delete=models.SET_NULL, null=True, related_name="payrolls"
+    )
+    pay_period = models.DateField()
     account_info = models.ForeignKey(AccountInfo, on_delete=models.SET_NULL, null=True)
     basic_salary = models.DecimalField(max_digits=10, decimal_places=2)
     allowances = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     deductions = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    net_pay = models.DecimalField(max_digits=10, decimal_places=2)
-    payment_status = models.CharField(max_length=20, choices=PaymentStatus.choices, default=PaymentStatus.PENDING)
+    net_pay = models.DecimalField(
+        max_digits=10, decimal_places=2, editable=False
+    )  
+    payment_status = models.CharField(
+        max_length=20, choices=PaymentStatus.choices, default=PaymentStatus.PENDING
+    )
     payment_date = models.DateField(null=True, blank=True)
-    transaction_reference = models.CharField(max_length=50, unique=True, blank=True, null=True)
+    transaction_reference = models.CharField(
+        max_length=50, unique=True, blank=True, null=True
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['-pay_period', 'staff__last_name']
-        unique_together = ['staff', 'pay_period']
+        ordering = ["-pay_period", "staff__last_name"]
+        unique_together = ["staff", "pay_period"]
 
     def __str__(self):
         return f"{self.staff} - {self.pay_period.strftime('%B %Y')}"
 
+    def save(self, *args, **kwargs):
+        self.calculate_net_pay()
+        if not self.transaction_reference:
+            self.generate_transaction_reference()
+        super().save(*args, **kwargs)
+
     def calculate_net_pay(self):
         self.net_pay = self.basic_salary + self.allowances - self.deductions
-        self.save()
 
     def generate_transaction_reference(self):
-        self.transaction_reference = f"PAY-{self.staff.staff_id}-{self.pay_period.strftime('%Y%m%d')}-{uuid.uuid4().hex[:6].upper()}"
-        self.save()
+        self.transaction_reference = f"PAY-{self.staff.staff_id}{self.pay_period.strftime('%Y%m%d')}{uuid.uuid4().hex[:6].upper()}"
 
-    @classmethod
-    def calculate_total_payroll(cls, pay_period):
-        total = cls.objects.filter(pay_period=pay_period).aggregate(
-            total_basic=Sum('basic_salary'),
-            total_allowances=Sum('allowances'),
-            total_deductions=Sum('deductions'),
-            total_net=Sum('net_pay')
-        )
-        return {
-            'total_basic_salary': total['total_basic'] or 0,
-            'total_allowances': total['total_allowances'] or 0,
-            'total_deductions': total['total_deductions'] or 0,
-            'total_net_pay': total['total_net'] or 0
-        }
 
-    @classmethod
-    def export_to_csv(cls, pay_period):
-        response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = f'attachment; filename="payroll_{pay_period.strftime("%Y%m")}.csv"'
-        
-        writer = csv.writer(response)
-        writer.writerow(['Staff ID', 'Name', 'Bank', 'Account Number', 'Basic Salary', 'Allowances', 'Deductions', 'Net Pay', 'Transaction Reference'])
-        
-        payrolls = cls.objects.filter(pay_period=pay_period).select_related('staff', 'account_info')
-        for payroll in payrolls:
-            writer.writerow([
-                payroll.staff.staff_id,
-                str(payroll.staff),
-                payroll.account_info.bank_name,
-                payroll.account_info.account_number,
-                payroll.basic_salary,
-                payroll.allowances,
-                payroll.deductions,
-                payroll.net_pay,
-                payroll.transaction_reference
-            ])
-        
-        return response
+# vb20827pa15
+# VD20240827155323
+# First Term School Fee
+# Cash

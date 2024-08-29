@@ -19,4 +19,4 @@ class Parent(models.Model):
     code = models.CharField(max_length=12, default=parent_id, unique=True)
 
     def __str__(self):
-        return f"{self.code} - {self.email}"
+        return self.parent_name

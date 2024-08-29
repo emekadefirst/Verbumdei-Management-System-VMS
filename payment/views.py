@@ -40,30 +40,27 @@ class AllPaymentView(APIView):
 
 
 class MakePaymentView(APIView):
-    def post(self, request, pk):
+    def post(self, request):
         serializer = PaymentSerializers(data=request.data)
         if serializer.is_valid():
-            parent = get_object_or_404(Parent, pk=pk)
             payment_type = serializer.validated_data["payment_type"]
+            parent = serializer.validated_data["parent"]
             email = parent.email
-            amount = payment_type["cost"]
+            amount = (
+                payment_type.cost
+            ) 
+
             try:
-                # Initialize Paystack Payment
                 payment = PaystackPayment(email, amount, secret_key)
                 data = payment.initialize_transaction()
 
-                # Save the payment instance with the reference
-                payment_instance = serializer.save(reference=data["references"])
+                # Save the Payment instance and set the reference field
+                payment_instance = serializer.save(reference=data["reference"])
 
-                return Response(
-                    {
-                        "payment_url": data["url"],
-                        "payment_reference": data["references"],
-                    },
-                    status=status.HTTP_201_CREATED,
-                )
+                return Response(data, status=status.HTTP_201_CREATED)
             except Exception as e:
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
