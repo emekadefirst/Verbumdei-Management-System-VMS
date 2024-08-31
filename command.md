@@ -20,3 +20,12 @@ gunicorn --workers 3 --bind 0.0.0.0:8000 server.wsgi:application --env DJANGO_SE
 gunicorn server.wsgi:application
 gunicorn server.wsgi:application --workers 3 --bind 0.0.0.0:8000
 
+
+{
+    "parent": "vb20827pa15",
+    "payment_type": "First Term School Fee",
+    "student": "VD20240827155323",
+    "method": "CASH"
+}
+https://verbumdei-management-system-vms.onrender.com/payment/make-payment/
+
