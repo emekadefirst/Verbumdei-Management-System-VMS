@@ -17,5 +17,6 @@ Migrations for 'api':
 
 
 gunicorn --workers 3 --bind 0.0.0.0:8000 server.wsgi:application --env DJANGO_SETTINGS_MODULE=server.settings.production
-
+gunicorn server.wsgi:application
+gunicorn server.wsgi:application --workers 3 --bind 0.0.0.0:8000
 
