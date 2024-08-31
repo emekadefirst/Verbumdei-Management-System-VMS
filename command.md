@@ -15,3 +15,7 @@ print(get_random_secret_key())
 Migrations for 'api':
   api\migrations\0001_initial.py
 
+
+gunicorn --workers 3 --bind 0.0.0.0:8000 server.wsgi:application --env DJANGO_SETTINGS_MODULE=server.settings.production
+
+

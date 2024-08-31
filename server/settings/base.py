@@ -14,7 +14,7 @@ adminv2.
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-DEBUG = False
+DEBUG = True
 
 INSTALLED_APPS = [
     "unfold",
