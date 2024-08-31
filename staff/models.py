@@ -124,7 +124,3 @@ class Payroll(models.Model):
         self.transaction_reference = f"PAY-{self.staff.staff_id}{self.pay_period.strftime('%Y%m%d')}{uuid.uuid4().hex[:6].upper()}"
 
 
-# vb20827pa15
-# VD20240827155323
-# First Term School Fee
-# Cash

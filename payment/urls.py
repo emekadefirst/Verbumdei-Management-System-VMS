@@ -1,5 +1,6 @@
 from django.urls import path
-from .views import PaymentTypeView, AllPaymentView, MakePaymentView, PaymentDetailView
+from .paystack import  MakePaymentView
+from .views import PaymentTypeView, AllPaymentView, PaymentDetailView
 
 urlpatterns = [
     path("payment-types/", PaymentTypeView.as_view(), name="payment-types"),
@@ -14,8 +15,3 @@ urlpatterns = [
 #     "student": "VD20240827155323",
 #     "method": "Cash"
 # }
-
-
-
-
-

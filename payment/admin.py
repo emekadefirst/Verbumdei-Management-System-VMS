@@ -7,7 +7,7 @@ from unfold.contrib.import_export.forms import ImportForm, SelectableFieldsExpor
 
 @admin.register(PaymentType)
 class PaymentTypeAdmin(ModelAdmin, ImportExportModelAdmin):
-    list_display = ["name", "cost"]
+    list_display = ["name", "amount"]
     search_fields = [
         "name",
     ]
@@ -30,3 +30,11 @@ class PaymentAdmin(ModelAdmin, ImportExportModelAdmin):
     ordering = ["-created_at"]
     import_form_class = ImportForm
     export_form_class = SelectableFieldsExportForm
+
+
+# vb20827pa15
+# VD20240827155323
+# First Term School Fee
+# Cash
+
+{"parent": "vb20827pa15", "payment_type": "First Term School Fee", "student": "VD20240827155323", "method": "Online"}

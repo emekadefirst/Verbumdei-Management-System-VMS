@@ -9,6 +9,7 @@ def parent_id():
     return f"vb{date_str}pa{time_str}"
 
 
+
 class Parent(models.Model):
     id = models.AutoField(primary_key=True)
     email = models.EmailField(max_length=50)
