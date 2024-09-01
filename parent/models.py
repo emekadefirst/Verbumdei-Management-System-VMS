@@ -17,7 +17,7 @@ class Parent(models.Model):
     phone_number_2 = models.CharField(max_length=14)
     parent_name = models.CharField(max_length=25)
     home_address = models.CharField(max_length=150)
-    code = models.CharField(max_length=12, default=parent_id, unique=True)
+    code = models.CharField(max_length=20, default=parent_id, unique=True)
 
     def __str__(self):
         return self.parent_name

@@ -30,7 +30,6 @@ DATABASES = {
     }
 }
 
-
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 CORS_ALLOWED_ORIGINS = [
