@@ -3,8 +3,8 @@ from dotenv import load_dotenv
 from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.views import APIView
-from .models import Payment, PaymentType  # Assuming these models are defined
-from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
+from .models import Payment  # Assuming these models are defined
 import hashlib
 import hmac
 import json
@@ -14,6 +14,7 @@ load_dotenv()
 PAYSTACK_SECRET_KEY = os.getenv("PAYSTACK_KEY")
 
 
+@csrf_exempt
 class Verify(APIView):
     def post(self, request):
         paystack_signature = request.headers.get("X-Paystack-Signature")
@@ -32,7 +33,6 @@ class Verify(APIView):
         event = data.get("event")
 
         if event == "paymentrequest.success":
-            # Assuming 'reference' is a field in your Payment model
             reference = data["data"].get("offline_reference")
 
             # Fetch the payment record using the reference
@@ -40,7 +40,6 @@ class Verify(APIView):
                 payment = Payment.objects.get(reference=reference)
                 payment.status = "successful"
                 payment.save()
-                # Additional processing if needed
             except Payment.DoesNotExist:
                 return JsonResponse(
                     {"error": "Payment not found"}, status=status.HTTP_404_NOT_FOUND
