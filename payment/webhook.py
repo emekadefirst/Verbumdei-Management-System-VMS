@@ -1,55 +1,58 @@
-import os
-from dotenv import load_dotenv
-from django.http import JsonResponse
-from rest_framework import status
-from rest_framework.views import APIView
-from django.views.decorators.csrf import csrf_exempt
-from .models import Payment  # Assuming these models are defined
-import hashlib
 import hmac
+import hashlib
 import json
+from django.http import JsonResponse
+from rest_framework.views import APIView
+from rest_framework import status
+from django.conf import settings
 
-load_dotenv()
 
-PAYSTACK_SECRET_KEY = os.getenv("PAYSTACK_KEY")
+# Function to verify the signature of the incoming request
+def verify_signature(request):
+    secret_key = settings.PAYSTACK_SECRET_KEY
+    signature = request.headers.get("x-paystack-signature")
+    if not signature:
+        return False
+
+    payload = request.body
+    hash = hmac.new(secret_key.encode("utf-8"), payload, hashlib.sha512).hexdigest()
+    return hmac.compare_digest(signature, hash)
 
 
-@csrf_exempt
-class Verify(APIView):
+class PaystackWebhookView(APIView):
     def post(self, request):
-        paystack_signature = request.headers.get("X-Paystack-Signature")
-        if not paystack_signature:
-            return JsonResponse(
-                {"error": "Signature missing"}, status=status.HTTP_400_BAD_REQUEST
-            )
-
-        # Verifying Paystack signature
-        if not self.verify_paystack_signature(request.body, paystack_signature):
+        if not verify_signature(request):
             return JsonResponse(
                 {"error": "Invalid signature"}, status=status.HTTP_400_BAD_REQUEST
             )
+        try:
+            event = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse(
+                {"error": "Invalid JSON"}, status=status.HTTP_400_BAD_REQUEST
+            )
+        event_type = event.get("event")
+        if event_type == "charge.success":
+            self.handle_charge_success(event)
+        elif event_type == "refund.processed":
+            self.handle_refund_processed(event)
+        elif event_type == "subscription.create":
+            self.handle_subscription_create(event)
+        else:
+            return JsonResponse(
+                {"error": "Unhandled event type"}, status=status.HTTP_400_BAD_REQUEST
+            )
 
-        data = json.loads(request.body)
-        event = data.get("event")
+        return JsonResponse({"status": "success"}, status=status.HTTP_200_OK)
 
-        if event == "paymentrequest.success":
-            reference = data["data"].get("offline_reference")
+    # def handle_charge_success(self, event):
+    #     # Implement your logic for a successful charge
+    #     pass
 
-            # Fetch the payment record using the reference
-            try:
-                payment = Payment.objects.get(reference=reference)
-                payment.status = "successful"
-                payment.save()
-            except Payment.DoesNotExist:
-                return JsonResponse(
-                    {"error": "Payment not found"}, status=status.HTTP_404_NOT_FOUND
-                )
+    # def handle_refund_processed(self, event):
+    #     # Implement your logic for a processed refund
+    #     pass
 
-        return JsonResponse({"status": "received"}, status=status.HTTP_200_OK)
-
-    def verify_paystack_signature(self, payload, signature):
-        secret = PAYSTACK_SECRET_KEY
-        computed_signature = hmac.new(
-            secret.encode("utf-8"), msg=payload, digestmod=hashlib.sha512
-        ).hexdigest()
-        return hmac.compare_digest(computed_signature, signature)
+    # def handle_subscription_create(self, event):
+    #     # Implement your logic for a new subscription
+    #     pass
