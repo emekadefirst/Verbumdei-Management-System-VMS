@@ -1,53 +1,56 @@
+import os
+from dotenv import load_dotenv
 from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.views import APIView
-from .models import Payment, PaymentType
+from .models import Payment, PaymentType  # Assuming these models are defined
+from django.conf import settings
+import hashlib
+import hmac
+import json
 
-def hook(request):
-    pass
+load_dotenv()
 
-# class Verify(APIView):
-#     def post(self, request):
-#         data = request.data
-#         status_response = data.get("event")
+PAYSTACK_SECRET_KEY = os.getenv("PAYSTACK_KEY")
 
-#         if status_response == "paymentrequest.success":
-#             try:
-#                 # Check if a payment with this transaction_id or reference already exists
-#                 if Payment.objects.filter(reference=data.get("reference")).exists():
-#                     return JsonResponse(
-#                         {"status": "duplicate"}, status=status.HTTP_200_OK
-#                     )
 
-#                 payment_type = PaymentType.objects.get(name=data.get("payment_type"))
+class Verify(APIView):
+    def post(self, request):
+        paystack_signature = request.headers.get("X-Paystack-Signature")
+        if not paystack_signature:
+            return JsonResponse(
+                {"error": "Signature missing"}, status=status.HTTP_400_BAD_REQUEST
+            )
 
-#                 payment = Payment(
-#                     transaction_id=data.get("transaction_id"),
-#                     status=data.get("status", "processing"),
-#                     payment_type=payment_type,
-#                     parent_id=data.get("parent_id"),
-#                     student_id=data.get("student_id"),
-#                     method=data.get("method"),
-#                     reference=data.get("reference"),
-#                 )
-#                 payment.save()
-#             except PaymentType.DoesNotExist:
-#                 return JsonResponse(
-#                     {"error": "Invalid payment type"},
-#                     status=status.HTTP_400_BAD_REQUEST,
-#                 )
-#             except Exception as e:
-#                 return JsonResponse(
-#                     {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
-#                 )
+        # Verifying Paystack signature
+        if not self.verify_paystack_signature(request.body, paystack_signature):
+            return JsonResponse(
+                {"error": "Invalid signature"}, status=status.HTTP_400_BAD_REQUEST
+            )
 
-#         print("Received webhook data:", data)
-#         return JsonResponse({"status": "success"}, status=status.HTTP_200_OK)
+        data = json.loads(request.body)
+        event = data.get("event")
 
-{
-    "email": "test@mail.com",
-    "phone_number_1": "3254678980",
-    "phone_number_2": "43278964835",
-    "parent_name": "Ogunmekpon",
-    "home_address": "This field is required."
-}
+        if event == "paymentrequest.success":
+            # Assuming 'reference' is a field in your Payment model
+            reference = data["data"].get("offline_reference")
+
+            # Fetch the payment record using the reference
+            try:
+                payment = Payment.objects.get(reference=reference)
+                payment.status = "successful"
+                payment.save()
+                # Additional processing if needed
+            except Payment.DoesNotExist:
+                return JsonResponse(
+                    {"error": "Payment not found"}, status=status.HTTP_404_NOT_FOUND
+                )
+
+        return JsonResponse({"status": "received"}, status=status.HTTP_200_OK)
+
+    def verify_paystack_signature(self, payload, signature):
+        secret = PAYSTACK_SECRET_KEY
+        computed_signature = hmac.new(
+            secret.encode("utf-8"), msg=payload, digestmod=hashlib.sha512
+        ).hexdigest()
+        return hmac.compare_digest(computed_signature, signature)
