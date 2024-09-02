@@ -12,7 +12,9 @@ from .serializers import StaffSerializer, AccountInfoSerializer, PayrollSerializ
 class StaffListCreateAPIView(APIView):
     def get(self, request, format=None):
         staff = Staff.objects.all()
-        serializer = StaffSerializer(staff, many=True)
+        serializer = StaffSerializer(
+            staff, many=True, context={"request": request}
+        )
         return Response(serializer.data)
 
     def post(self, request, format=None):

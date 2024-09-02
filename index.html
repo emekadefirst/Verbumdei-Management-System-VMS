@@ -1,81 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Staff List</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Staff Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-bottom: 20px;
+        }
+
+        .staff-details {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .staff-details li {
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 
 <body>
-    <div class="container my-5">
-        <h1 class="text-center mb-4">Staff List</h1>
-        <div class="table-responsive">
-            <table class="table table-striped table-bordered">
-                <thead class="table-dark">
-                    <tr>
-                        <th>Profile</th>
-                        <th>Staff ID</th>
-                        <th>Name</th>
-                        <th>Gender</th>
-                        <th>Phone Numbers</th>
-                        <th>Email</th>
-                        <th>Position</th>
-                        <th>Employment Type</th>
-                        <th>Staff Type</th>
-                        <th>Status</th>
-                        <th>State of Origin</th>
-                        <th>LGA</th>
-                        <th>Home Address</th>
-                        <th>NIN</th>
-                        <th>BVN</th>
-                        <th>Created At</th>
-                    </tr>
-                </thead>
-                <tbody id="staff-table-body">
-                </tbody>
-            </table>
-        </div>
+
+    <div class="container">
+        <h2>Staff Details</h2>
+        <img id="profile-img" class="profile-img" src="" alt="Profile Image">
+        <ul class="staff-details">
+            <li><strong>ID:</strong> <span id="staff-id"></span></li>
+            <li><strong>Name:</strong> <span id="name"></span></li>
+            <li><strong>Gender:</strong> <span id="gender"></span></li>
+            <li><strong>Email:</strong> <span id="email"></span></li>
+            <li><strong>Phone 1:</strong> <span id="phone1"></span></li>
+            <li><strong>Phone 2:</strong> <span id="phone2"></span></li>
+            <li><strong>Employment Type:</strong> <span id="employment-type"></span></li>
+            <li><strong>Position:</strong> <span id="position"></span></li>
+            <li><strong>Status:</strong> <span id="status"></span></li>
+            <li><strong>Address:</strong> <span id="address"></span></li>
+        </ul>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        const apiUrl = 'https://verbumdei-management-system-vms.onrender.com/staff/staff/';
-        const tableBody = document.getElementById('staff-table-body');
+        // The API endpoint
+        const apiUrl = 'http://127.0.0.1:8000/staff/staff/';
 
-        async function fetchStaffData() {
-            try {
-                const response = await fetch(apiUrl);
-                const staffList = await response.json();
-                
-                staffList.forEach(staff => {
-                    const row = `
-                        <tr>
-                            <td><img src=${staff.profile_img}" alt="${staff.first_name} ${staff.last_name}" class="img-thumbnail" style="width: 50px; height: 50px;"></td>
-                            <td>${staff.staff_id}</td>
-                            <td>${staff.first_name} ${staff.other_name ? staff.other_name : ''} ${staff.last_name}</td>
-                            <td>${staff.gender}</td>
-                            <td>${staff.phone_number_1}<br>${staff.phone_number_2}</td>
-                            <td>${staff.email}</td>
-                            <td>${staff.position}</td>
-                            <td>${staff.employment_type.replace('_', ' ')}</td>
-                            <td>${staff.staff_type}</td>
-                            <td>${staff.status}</td>
-                            <td>${staff.state_of_origin}</td>
-                            <td>${staff.local_government_area}</td>
-                            <td>${staff.home_address}</td>
-                            <td>${staff.nin}</td>
-                            <td>${staff.bvn}</td>
-                            <td>${new Date(staff.created_at).toLocaleString()}</td>
-                        </tr>
-                    `;
-                    tableBody.insertAdjacentHTML('beforeend', row);
-                });
-            } catch (error) {
-                console.error('Error fetching staff data:', error);
-            }
-        }
-        window.onload = fetchStaffData;
+        // Fetch data from the API
+        fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+                // Assuming data is an array, take the first object (if it's a list)
+                const staff = data[0]; // Adjust this if you have more than one staff or different structure
+
+                // Populate the HTML with the data
+                document.getElementById('profile-img').src = staff.profile_img;
+                document.getElementById('staff-id').textContent = staff.staff_id;
+                document.getElementById('name').textContent = `${staff.first_name} ${staff.other_name} ${staff.last_name}`;
+                document.getElementById('gender').textContent = staff.gender;
+                document.getElementById('email').textContent = staff.email;
+                document.getElementById('phone1').textContent = staff.phone_number_1;
+                document.getElementById('phone2').textContent = staff.phone_number_2;
+                document.getElementById('employment-type').textContent = staff.employment_type;
+                document.getElementById('position').textContent = staff.position;
+                document.getElementById('status').textContent = staff.status;
+                document.getElementById('address').textContent = staff.home_address;
+            })
+            .catch(error => console.error('Error fetching data:', error));
     </script>
+
 </body>
+
 </html>

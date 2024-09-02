@@ -11,7 +11,7 @@ from .serializers import StudentSerializer
 class StudentView(APIView):
     def get(self, request, format=None):
         student = Student.objects.all()
-        serializer = StudentSerializer(student, many=True)
+        serializer = StudentSerializer(student, many=True, context={"request": request})
         return Response(serializer.data)
 
     def post(self, request, format=None):

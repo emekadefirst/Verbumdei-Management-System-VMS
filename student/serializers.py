@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.response import Response
 from .models import Student
 from grade.serializers import ClassSerializer
 from parent.serializers import ParentSerializer
@@ -34,3 +35,9 @@ class StudentSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         return super().update(instance, validated_data)
+
+    def get_profile_image_url(self, obj):
+        request = self.context.get("request")
+        if obj.profile_image and hasattr(obj.profile_image, "url"):
+            return request.build_absolute_uri(obj.profile_image.url)
+        return None

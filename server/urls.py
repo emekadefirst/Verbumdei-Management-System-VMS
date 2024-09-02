@@ -36,6 +36,4 @@ urlpatterns = [
     path("class/", include("grade.urls")),
     path("payment/", include("payment.urls")),
     path("sub-admin/", include("subadmins.urls")),
-]
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
