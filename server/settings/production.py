@@ -20,17 +20,7 @@ MIDDLEWARE = [
 ]
 
 # Serve static files with WhiteNoise
-STATIC_URL = "/static/"
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
-# Serve media files with WhiteNoise
-MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "server/media")
-
-# Custom storage classes (if you have them)
-DEFAULT_FILE_STORAGE = (
-    "django.core.files.storage.FileSystemStorage"  # Default Django storage
-)
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 DATABASES = {

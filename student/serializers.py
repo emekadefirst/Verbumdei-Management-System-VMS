@@ -5,9 +5,12 @@ from grade.models import Class
 
 
 class StudentSerializer(serializers.ModelSerializer):
-    parent = serializers.CharField()
-    class_assigned = serializers.CharField()
-    profile_image = serializers.ImageField()
+    parent = serializers.CharField(
+        max_length=25
+    ) 
+    class_assigned = serializers.CharField(
+        max_length=12
+    ) 
 
     class Meta:
         model = Student
@@ -27,41 +30,26 @@ class StudentSerializer(serializers.ModelSerializer):
             "profile_image",
             "class_assigned",
         ]
-        read_only_fields = ("registration_id", "created_at")
+
+    def validate_parent(self, value):
+        try:
+            return Parent.objects.get(parent_name=value)
+        except Parent.DoesNotExist:
+            raise serializers.ValidationError(
+                f"Parent with name '{value}' does not exist."
+            )
+
+    def validate_class_assigned(self, value):
+        try:
+            return Class.objects.get(name=value)
+        except Class.DoesNotExist:
+            raise serializers.ValidationError(
+                f"Class with name '{value}' does not exist."
+            )
 
     def create(self, validated_data):
-        parent_name = validated_data.pop("parent")
-        class_assigned_name = validated_data.pop("class_assigned")
-
-        # Fetch or create parent and class based on names
-        parent = Parent.objects.get(
-            full_name=parent_name
-        )  # Adjust field name if needed
-        class_assigned = Class.objects.get(
-            name=class_assigned_name
-        )  # Adjust field name if needed
-
-        student = Student.objects.create(
+        parent = validated_data.pop("parent")
+        class_assigned = validated_data.pop("class_assigned")
+        return Student.objects.create(
             parent=parent, class_assigned=class_assigned, **validated_data
         )
-        return student
-
-    def update(self, instance, validated_data):
-        parent_name = validated_data.pop("parent", None)
-        class_assigned_name = validated_data.pop("class_assigned", None)
-
-        if parent_name:
-            parent = Parent.objects.get(full_name=parent_name)
-            instance.parent = parent
-
-        if class_assigned_name:
-            class_assigned = Class.objects.get(name=class_assigned_name)
-            instance.class_assigned = class_assigned
-
-        return super().update(instance, validated_data)
-
-    def get_profile_image_url(self, obj):
-        request = self.context.get("request")
-        if obj.profile_image and hasattr(obj.profile_image, "url"):
-            return request.build_absolute_uri(obj.profile_image.url)
-        return None

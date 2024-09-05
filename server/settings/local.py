@@ -8,23 +8,14 @@ SECRET_KEY = os.environ.get('LOCAL_KEY')
 
 ALLOWED_HOSTS = []
 
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.sqlite3",
-#         "NAME": BASE_DIR / "verbumdeiMS.db"
-#     }
-# }
-
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ.get("DATABASE_NAME"),
-        "USER": os.environ.get("DATABASE_USER"),
-        "PASSWORD": os.environ.get("DATABASE_PASSWORD"),
-        "HOST": os.environ.get("DATABASE_HOST"),
-        "OPTIONS": {"sslmode": "require"},
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "verbumdeiMS.db"
     }
 }
+
+
 
 CORS_ALLOWED_ORIGINS = ["http://127.0.0.1:5500", "http://localhost:3000"]
 
