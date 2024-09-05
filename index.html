@@ -8,218 +8,162 @@
     <style>
         body {
             font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
             margin: 0;
             padding: 20px;
-            background-color: #f0f0f0;
         }
 
         .container {
             max-width: 600px;
             margin: auto;
-            background: white;
             padding: 20px;
+            background: white;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
         h1 {
             text-align: center;
-            margin-bottom: 20px;
+            color: #333;
         }
 
-        label {
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
             display: block;
-            margin-top: 10px;
+            margin-bottom: 5px;
             font-weight: bold;
         }
 
-        input,
-        select {
+        .form-group input,
+        .form-group select {
             width: 100%;
             padding: 8px;
-            margin-top: 5px;
-            margin-bottom: 20px;
             border: 1px solid #ccc;
             border-radius: 4px;
         }
 
-        button {
-            width: 100%;
-            padding: 10px;
-            background-color: #28a745;
-            border: none;
+        .form-group input[type="file"] {
+            padding: 0;
+        }
+
+        .form-group button {
+            background-color: #007bff;
             color: white;
+            border: none;
+            padding: 10px 15px;
             font-size: 16px;
-            border-radius: 4px;
             cursor: pointer;
+            border-radius: 4px;
         }
 
-        button:hover {
-            background-color: #218838;
+        .form-group button:hover {
+            background-color: #0056b3;
         }
 
-        #error-message {
+        .error {
             color: red;
-            margin-top: 20px;
+            font-size: 0.9em;
         }
     </style>
 </head>
 
 <body>
-
     <div class="container">
-        <h1>Register Student</h1>
+        <h1>Student Registration Form</h1>
         <form id="studentForm">
-            <label for="first_name">First Name</label>
-            <input type="text" id="first_name" name="first_name" required>
-
-            <label for="other_name">Other Name</label>
-            <input type="text" id="other_name" name="other_name" required>
-
-            <label for="last_name">Last Name</label>
-            <input type="text" id="last_name" name="last_name" required>
-
-            <label for="date_of_birth">Date of Birth</label>
-            <input type="date" id="date_of_birth" name="date_of_birth" required>
-
-            <label for="gender">Gender</label>
-            <select id="gender" name="gender" required>
-                <option value="MALE">Male</option>
-                <option value="FEMALE">Female</option>
-            </select>
-
-            <label for="type">Type</label>
-            <select id="type" name="type" required>
-                <option value="DAY">Day</option>
-                <option value="BOARDER">Boarder</option>
-            </select>
-
-            <label for="home_address">Home Address</label>
-            <input type="text" id="home_address" name="home_address" required>
-
-            <label for="state_of_origin">State of Origin</label>
-            <input type="text" id="state_of_origin" name="state_of_origin" required>
-
-            <label for="local_government_area">Local Government Area</label>
-            <input type="text" id="local_government_area" name="local_government_area" required>
-
-            <label for="nationality">Nationality</label>
-            <input type="text" id="nationality" name="nationality" required>
-
-            <label for="parent">Parent</label>
-            <select id="parent" name="parent" required></select>
-
-            <label for="religion">Religion</label>
-            <input type="text" id="religion" name="religion" required>
-
-            <label for="class_assigned">Class Assigned</label>
-            <select id="class_assigned" name="class_assigned" required></select>
-
-            <label for="profile_image">Profile Image</label>
-            <input type="file" id="profile_image" name="profile_image" required>
-
-            <button type="submit">Register</button>
-
-            <p id="error-message"></p>
+            <div class="form-group">
+                <label for="first_name">First Name:</label>
+                <input type="text" id="first_name" name="first_name" required>
+            </div>
+            <div class="form-group">
+                <label for="other_name">Other Name:</label>
+                <input type="text" id="other_name" name="other_name">
+            </div>
+            <div class="form-group">
+                <label for="last_name">Last Name:</label>
+                <input type="text" id="last_name" name="last_name" required>
+            </div>
+            <div class="form-group">
+                <label for="date_of_birth">Date of Birth:</label>
+                <input type="text" id="date_of_birth" name="date_of_birth" required>
+            </div>
+            <div class="form-group">
+                <label for="gender">Gender:</label>
+                <select id="gender" name="gender" required>
+                    <option value="MALE">Male</option>
+                    <option value="FEMALE">Female</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="type">Type:</label>
+                <select id="type" name="type" required>
+                    <option value="DAY">Day</option>
+                    <option value="BOARDER">Boarder</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="home_address">Home Address:</label>
+                <input type="text" id="home_address" name="home_address" required>
+            </div>
+            <div class="form-group">
+                <label for="state_of_origin">State of Origin:</label>
+                <input type="text" id="state_of_origin" name="state_of_origin" required>
+            </div>
+            <div class="form-group">
+                <label for="local_government_area">Local Government Area:</label>
+                <input type="text" id="local_government_area" name="local_government_area" required>
+            </div>
+            <div class="form-group">
+                <label for="nationality">Nationality:</label>
+                <input type="text" id="nationality" name="nationality" required>
+            </div>
+            <div class="form-group">
+                <label for="parent">Parent Name:</label>
+                <input type="text" id="parent" name="parent" required>
+            </div>
+            <div class="form-group">
+                <label for="religion">Religion:</label>
+                <input type="text" id="religion" name="religion" required>
+            </div>
+            <div class="form-group">
+                <label for="profile_image">Profile Image:</label>
+                <input type="file" id="profile_image" name="profile_image" accept="image/*" required>
+            </div>
+            <div class="form-group">
+                <label for="class_assigned">Class Assigned:</label>
+                <input type="text" id="class_assigned" name="class_assigned" required>
+            </div>
+            <div class="form-group">
+                <button type="submit">Submit</button>
+            </div>
+            <div id="error-message" class="error"></div>
         </form>
     </div>
-
     <script>
-        // Function to fetch and populate parents from the API
-        function fetchParents() {
-            fetch('http://127.0.0.1:8000/parent/')
+        document.getElementById('studentForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const form = document.getElementById('studentForm');
+            const formData = new FormData(form);
+
+            fetch('http://127.0.0.1:8000/student/students/', {
+                method: 'POST',
+                body: formData
+            })
                 .then(response => response.json())
                 .then(data => {
-                    const parentSelect = document.getElementById('parent');
-                    data.forEach(parent => {
-                        const option = document.createElement('option');
-                        option.value = parent.code;
-                        option.textContent = `${parent.parent_name} (${parent.email})`;
-                        parentSelect.appendChild(option);
-                    });
+                    console.log('Success:', data);
+                    alert('Student registered successfully!');
                 })
                 .catch(error => {
-                    console.error('Error fetching parents:', error);
+                    console.error('Error:', error);
+                    document.getElementById('error-message').textContent = 'An error occurred. Please check the console for details.';
                 });
-        }
-
-        // Function to fetch and populate classes from the API
-        function fetchClasses() {
-            fetch('http://127.0.0.1:8000/class/classes/')
-                .then(response => response.json())
-                .then(data => {
-                    const classSelect = document.getElementById('class_assigned');
-                    data.forEach(classData => {
-                        const option = document.createElement('option');
-                        option.value = classData.id;
-                        option.textContent = classData.name;
-                        classSelect.appendChild(option);
-                    });
-                })
-                .catch(error => {
-                    console.error('Error fetching classes:', error);
-                });
-        }
-
-        // Fetch parents and classes on page load
-        document.addEventListener('DOMContentLoaded', function () {
-            fetchParents();
-            fetchClasses();
         });
-
-        // Handle form submission
- document.getElementById('studentForm').addEventListener('submit', function (e) {
-        e.preventDefault();
-        const form = e.target;
-        const formData = new FormData(form);
-
-        // Ensure parent and class_assigned values are correctly appended
-        const parentSelect = document.getElementById('parent');
-        const classSelect = document.getElementById('class_assigned');
-
-        const selectedParent = parentSelect.options[parentSelect.selectedIndex].value;
-        const selectedClass = classSelect.options[classSelect.selectedIndex].value;
-
-        if (selectedParent) {
-            formData.set('parent', selectedParent);
-        } else {
-            console.error('Parent not selected');
-        }
-
-        if (selectedClass) {
-            formData.set('class_assigned', selectedClass);
-        } else {
-            console.error('Class not selected');
-        }
-
-        // Format the date in YYYY-MM-DD format
-        const dobInput = document.getElementById('date_of_birth');
-        const date = new Date(dobInput.value);
-        const formattedDate = date.toISOString().split('T')[0];  // Correct format YYYY-MM-DD
-        formData.set('date_of_birth', formattedDate);
-
-        // Submit form data to the API
-        fetch('http://127.0.0.1:8000/student/students/', {
-            method: 'POST',
-            body: formData
-        })
-            .then(response => {
-                if (!response.ok) {
-                    return response.json().then(data => { throw data; });
-                }
-                return response.json();
-            })
-            .then(data => {
-                alert('Student registered successfully!');
-                form.reset();  // Clear the form after successful registration
-            })
-            .catch(error => {
-                document.getElementById('error-message').textContent = 'Error: ' + JSON.stringify(error);
-            });
-    });
-
     </script>
-
 </body>
 
 </html>
