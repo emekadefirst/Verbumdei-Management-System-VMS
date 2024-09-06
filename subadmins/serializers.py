@@ -1,38 +1,53 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Sub_Admin
-
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name']
-
+from django.contrib.auth.hashers import make_password
+from rest_framework.exceptions import ValidationError
+from rest_framework.validators import UniqueValidator
 
 
 class SubAdminSerializer(serializers.ModelSerializer):
-    user = UserSerializer()
+    email = serializers.EmailField(
+        required=True, validators=[UniqueValidator(queryset=User.objects.all())]
+    )
+    password = serializers.CharField(write_only=True)
 
     class Meta:
-        model = Sub_Admin
-        fields = ['id', 'user']
+        model = User
+        fields = ["username", "email", "password"]
 
     def create(self, validated_data):
-        user_data = validated_data.pop('user')
-        user = User.objects.create(**user_data)
-        sub_admin = Sub_Admin.objects.create(user=user, **validated_data)
-        return sub_admin
+        validated_data["password"] = make_password(validated_data.get("password"))
+        user = User.objects.create(**validated_data)
+        return user
 
-    def update(self, instance, validated_data):
-        user_data = validated_data.pop('user')
-        user = instance.user
 
-        # Update the user fields
-        user.username = user_data.get('username', user.username)
-        user.email = user_data.get('email', user.email)
-        user.first_name = user_data.get('first_name', user.first_name)
-        user.last_name = user_data.get('last_name', user.last_name)
-        user.save()
+class SubAdminLoginSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True)
+    user = serializers.SerializerMethodField()
 
-        # Update the Sub_Admin fields
-        instance.save()
-        return instance
+    def validate(self, data):
+        email = data.get("email")
+        password = data.get("password")
+
+        if not email or not password:
+            raise ValidationError('Must include "email" and "password"')
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            raise ValidationError("Invalid email or password")
+
+        if not user.check_password(password):
+            raise ValidationError("Invalid email or password")
+
+        data["user"] = user
+        return data
+
+    def get_user(self, obj):
+        user = obj.get("user")
+        return {
+            "id": user.id,
+            "username": user.username,
+            "email": user.email,
+        }

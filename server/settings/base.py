@@ -18,27 +18,28 @@ DEBUG = False
 
 INSTALLED_APPS = [
     "unfold",
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'drf_yasg',
-    'import_export',
-    'rest_framework',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "drf_yasg",
+    "import_export",
+    "rest_framework",
+    "rest_framework.authtoken",
     "corsheaders",
     # installed Apps
-    'staff',
-    'student',
-    'parent',
-    'program',
-    'grade',
-    'asessment',
-    'inventory',
-    'subadmins',
-    'payment',
-    ]
+    "staff",
+    "student",
+    "parent",
+    "program",
+    "grade",
+    "asessment",
+    "inventory",
+    "subadmins",
+    "payment",
+]
 
 ROOT_URLCONF = 'server.urls'
 
@@ -75,6 +76,19 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework.authentication.TokenAuthentication",
+    ),
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
+}
+
+# Ensure email addresses are unique
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+]
+
 
 LANGUAGE_CODE = 'en-us'
 

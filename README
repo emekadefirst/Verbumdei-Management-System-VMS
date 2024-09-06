@@ -2,3 +2,12 @@
 
         --Using waitress to runserver
         waitress-serve --listen=*:8000 server.server.wsgi:application
+
+
+to add inventory 
+    {
+        "name": "Riders",
+        "type": "Logistics",
+        "quantity": 20,
+        "unit_cost": 149.99
+    }
