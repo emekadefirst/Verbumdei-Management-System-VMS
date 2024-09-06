@@ -11,3 +11,14 @@ to add inventory
         "quantity": 20,
         "unit_cost": 149.99
     }
+
+{
+  "username": "tester",
+  "email": "test@mail.com",
+  "password": "test@mail.com"
+}
+
+{
+  "email": "test@mail.com",
+  "password": "test@mail.com"
+}
