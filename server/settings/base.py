@@ -27,7 +27,7 @@ INSTALLED_APPS = [
     "drf_yasg",
     "import_export",
     "rest_framework",
-    "rest_framework.authtoken",
+    # "rest_framework.authtoken",
     "corsheaders",
     # installed Apps
     "staff",
@@ -37,7 +37,6 @@ INSTALLED_APPS = [
     "grade",
     "asessment",
     "inventory",
-    "subadmins",
     "payment",
 ]
 
@@ -77,12 +76,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework.authentication.TokenAuthentication",
-    ),
-    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
-}
 
 # Ensure email addresses are unique
 AUTHENTICATION_BACKENDS = [

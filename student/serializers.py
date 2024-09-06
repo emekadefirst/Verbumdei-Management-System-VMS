@@ -31,6 +31,8 @@ class StudentSerializer(serializers.ModelSerializer):
             "class_assigned",
         ]
 
+        read_only_fields = ("registration_id", "registration_date")
+
     def validate_parent(self, value):
         try:
             return Parent.objects.get(parent_name=value)
