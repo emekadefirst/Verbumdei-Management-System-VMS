@@ -27,7 +27,6 @@ INSTALLED_APPS = [
     "drf_yasg",
     "import_export",
     "rest_framework",
-    # "rest_framework.authtoken",
     "corsheaders",
     # installed Apps
     "staff",
@@ -77,10 +76,10 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Ensure email addresses are unique
-AUTHENTICATION_BACKENDS = [
-    "django.contrib.auth.backends.ModelBackend",
-]
+# # Ensure email addresses are unique
+# AUTHENTICATION_BACKENDS = [
+#     "django.contrib.auth.backends.ModelBackend",
+# ]
 
 
 LANGUAGE_CODE = 'en-us'

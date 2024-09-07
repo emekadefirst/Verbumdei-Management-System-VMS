@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-secret_key = os.getenv("PAYSTACK_KEY")
+secret_key = os.environ.get("PAYSTACK_KEY")
 
 
 class MakePaymentView(APIView):

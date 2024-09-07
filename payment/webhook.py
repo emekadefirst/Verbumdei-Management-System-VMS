@@ -1,13 +1,11 @@
-import os
-from dotenv import load_dotenv
+from .paystack import secret_key
 import hashlib
 import hmac
 import json
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from .models import Payment
-load_dotenv()
 
 @csrf_exempt
 @require_http_methods(["POST"])
@@ -19,7 +17,7 @@ def verify_payment(request):
         payload = json.loads(request.body)
     except json.JSONDecodeError:
         return JsonResponse({"error": "Invalid JSON payload"}, status=400)
-    secret_key = os.getenv("PAYSTACK_KEY")
+    
     computed_signature = hmac.new(
         secret_key.encode("utf-8"), request.body, hashlib.sha512
     ).hexdigest()

@@ -7,6 +7,7 @@ SECRET_KEY = os.environ.get("PRODUCTION_KEY")
 
 ALLOWED_HOSTS = ["*"]
 
+
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
@@ -19,9 +20,6 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
@@ -32,6 +30,9 @@ DATABASES = {
         "OPTIONS": {"sslmode": "require"},
     }
 }
+
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
 
 CORS_ALLOWED_ORIGINS = ["http://127.0.0.1:5500", "http://localhost:3000"]
 
