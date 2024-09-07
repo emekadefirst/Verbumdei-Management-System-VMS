@@ -3,3 +3,4 @@ env/
 __pycache__/
 app.py
 verbumdeiMS.db
+run.sh

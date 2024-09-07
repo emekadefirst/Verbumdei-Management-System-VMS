@@ -59,7 +59,7 @@ class PaymentSerializers(serializers.ModelSerializer):
         )
         instance.student = validated_data.get("student", instance.student)
         instance.method = validated_data.get("method", instance.method)
-
+        instance.status = validated_data.get("status", instance.status)
         # Optionally update the reference if needed
         reference = validated_data.get("reference", None)
         if reference:
