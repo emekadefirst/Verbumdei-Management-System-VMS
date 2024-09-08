@@ -5,16 +5,13 @@ from grade.models import Class
 
 
 class StudentSerializer(serializers.ModelSerializer):
-    parent = serializers.CharField(
-        max_length=25
-    ) 
-    class_assigned = serializers.CharField(
-        max_length=12
-    ) 
+    parent = serializers.CharField(max_length=25)
+    class_assigned = serializers.CharField(max_length=12)
 
     class Meta:
         model = Student
         fields = [
+            "registration_id",  # Add this field to the serializer
             "first_name",
             "other_name",
             "last_name",

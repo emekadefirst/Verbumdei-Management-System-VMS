@@ -1,6 +1,9 @@
 from django.contrib import admin
 from django.urls import path, include, re_path
+from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns 
+from django.views.static import serve
 from django.conf import settings
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
@@ -21,6 +24,8 @@ schema_view = get_schema_view(
 
 
 urlpatterns = [
+    re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
+    re_path(r'^static/(?P<path>.*)$', serve, {'document_root': settings.STATIC_ROOT}),
     path("admin/", admin.site.urls),
     re_path(
         r"^$", schema_view.with_ui("swagger", cache_timeout=0), name="schema-swagger-ui"
