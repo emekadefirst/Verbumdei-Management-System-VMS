@@ -36,7 +36,7 @@ class Student(models.Model):
     religion = models.CharField(max_length=20)
     class_assigned = models.ForeignKey(Class, on_delete=models.SET_NULL, null=True)
     upload = models.ImageField(upload_to="Student_profile/")
-    profile_image = models.URLField(max_length=500, blank=True)
+    img_url = models.URLField(max_length=500, blank=True)
     registration_date = models.DateTimeField(auto_now=True)
 
     def save(self, *args, **kwargs):

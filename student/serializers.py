@@ -26,7 +26,7 @@ class StudentSerializer(serializers.ModelSerializer):
             "parent",
             "religion",
             "upload",
-            "profile_image",
+            "img_url",
             "class_assigned",
         ]
 
