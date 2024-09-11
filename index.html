@@ -111,7 +111,7 @@
     <script>
         // Function to fetch and display student data
         function fetchStudents() {
-            fetch('https://verbumdei-management-system-vms.onrender.com/student/students/')
+            fetch('http://127.0.0.1:8000/student/students/')
                 .then(response => response.json())
                 .then(data => {
                     const tableBody = document.getElementById('student-table-body');
@@ -160,7 +160,7 @@
             formData.append('upload', document.getElementById('upload').files[0]);
 
             // Send POST request to the API
-            fetch('https://verbumdei-management-system-vms.onrender.com/student/students/', {
+            fetch('http://127.0.0.1:8000/student/students/', {
                 method: 'POST',
                 body: formData
             })
