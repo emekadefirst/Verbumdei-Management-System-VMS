@@ -25,11 +25,12 @@ class StudentSerializer(serializers.ModelSerializer):
             "nationality",
             "parent",
             "religion",
+            "upload",
             "profile_image",
             "class_assigned",
         ]
 
-        read_only_fields = ("registration_id", "registration_date")
+        read_only_fields = ("registration_id", "registration_date", "profile_image")
 
     def validate_parent(self, value):
         try:
