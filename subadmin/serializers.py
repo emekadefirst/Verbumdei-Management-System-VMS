@@ -3,20 +3,15 @@ from .models import SubAdmin
 from staff.models import Staff
 
 
-class StaffSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Staff
-        fields = ["staff_id"]
-
-
 class SubAdminSerializer(serializers.ModelSerializer):
-    staff = StaffSerializer()
+    # Use SlugRelatedField to allow lookups by 'staff_id'
+    staff = serializers.SlugRelatedField(
+        slug_field="staff_id", queryset=Staff.objects.all()
+    )
 
     class Meta:
         model = SubAdmin
         fields = [
-            "first_name",
-            "last_name",
             "email",
             "username",
             "password",
@@ -25,14 +20,13 @@ class SubAdminSerializer(serializers.ModelSerializer):
             "staff",
         ]
         extra_kwargs = {
-            "password": {"write_only": True}, 
+            "password": {"write_only": True},
         }
+        read_only_fields = ("created_at", "admin_id")
 
     def create(self, validated_data):
-        staff_data = validated_data.pop("staff")
-        staff = Staff.objects.get(staff_id=staff_data["staff_id"])
         password = validated_data.pop("password")
-        subadmin = SubAdmin.objects.create(staff=staff, **validated_data)
+        subadmin = SubAdmin.objects.create(**validated_data)
         subadmin.set_password(password)
         subadmin.save()
 

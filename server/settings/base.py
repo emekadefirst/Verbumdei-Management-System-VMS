@@ -82,6 +82,8 @@ AUTH_PASSWORD_VALIDATORS = [
 #     "django.contrib.auth.backends.ModelBackend",
 # ]
 
+AUTH_USER_MODEL = "subadmin.SubAdmin"  
+
 
 LANGUAGE_CODE = 'en-us'
 
