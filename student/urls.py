@@ -1,6 +1,9 @@
 from django.urls import path
 from . import views
 
+
+
+
 urlpatterns = [
     path("search/", views.StudentSearch.as_view(), name="student-search"),
     path("students/", views.StudentView.as_view(), name="student-list-create"),

@@ -1,29 +1,32 @@
 from django.db import models
 from django.utils import timezone
 from student.models import Student
+from grade.models import Subject
+
+
 
 class Quiz(models.Model):
     class QUIZ_TYPE(models.TextChoices):
-        EXAMINATION = "EXAMINATION", "examination"
-        CONTINUOUS_ASSESSMENT = "CONTINUOUS_ASSESSMENT", "continuous assessment"
-    
-    type = models.CharField(max_length=25, choices=QUIZ_TYPE.choices)  
-    title = models.CharField(max_length=200)
-    description = models.TextField()
+        EXAMINATION = "EXAMINATION", "Examination"
+        CONTINUOUS_ASSESSMENT = "CONTINUOUS_ASSESSMENT", "Continuous assessment"
+    id = models.AutoField(primary_key=True)
+    type = models.CharField(max_length=25, choices=QUIZ_TYPE.choices)
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE, blank=True, null=True) 
     created_at = models.DateTimeField(auto_now_add=True)
     time_limit = models.IntegerField(null=True, blank=True, help_text="Time limit in minutes")
     is_active = models.BooleanField(default=True)
 
+
     def __str__(self):
-        return self.title
+        return self.subject.name
 
 class Question(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name='questions')
     text = models.TextField()
-    points = models.IntegerField(default=1)
+
 
     def __str__(self):
-        return self.text[:50]
+        return self.text
 
 class Option(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='options')
@@ -45,6 +48,7 @@ class QuizAttempt(models.Model):
     score = models.IntegerField(default=0)
     start_time = models.DateTimeField(auto_now_add=True)
     completed_at = models.DateTimeField(null=True, blank=True)
+    duration = models.IntegerField(null=True, blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='in_progress')
 
     def __str__(self):
@@ -77,6 +81,8 @@ class QuizAttempt(models.Model):
         self.status = 'timed_out'
         self.completed_at = timezone.now()
         self.save()
+        
+        
 
 class StudentAnswer(models.Model):
     quiz_attempt = models.ForeignKey(QuizAttempt, on_delete=models.CASCADE, related_name='answers')
@@ -84,7 +90,7 @@ class StudentAnswer(models.Model):
     selected_option = models.ForeignKey(Option, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"{self.quiz_attempt.student} - {self.question.text[:30]}"
+        return f"{self.quiz_attempt.student.registration_id} - {self.question.text}"
 
     class Meta:
         unique_together = ['quiz_attempt', 'question']

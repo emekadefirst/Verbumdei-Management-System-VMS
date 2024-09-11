@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import Student
 from parent.models import Parent
 from grade.models import Class
+from .models import Attendance
 
 
 class StudentSerializer(serializers.ModelSerializer):
@@ -52,3 +53,9 @@ class StudentSerializer(serializers.ModelSerializer):
         return Student.objects.create(
             parent=parent, class_assigned=class_assigned, **validated_data
         )
+
+
+class AttendanceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Attendance
+        fields = "__all__"

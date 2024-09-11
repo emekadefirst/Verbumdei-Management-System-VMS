@@ -2,8 +2,6 @@ from django.contrib import admin
 from django.utils.html import format_html
 from .models import Quiz, Question, Option, QuizAttempt, StudentAnswer
 
-
-
 class OptionInline(admin.TabularInline):
     model = Option
     extra = 4
@@ -20,9 +18,9 @@ class QuestionInline(admin.StackedInline):
 
 @admin.register(Quiz)
 class QuizAdmin(admin.ModelAdmin):
-    list_display = ('title', 'type', 'question_count', 'is_active', 'time_limit', 'created_at')
+    list_display = ('subject', 'type', 'question_count', 'is_active', 'time_limit', 'created_at')
     list_filter = ('type', 'is_active', 'created_at')
-    search_fields = ('title', 'description')
+    search_fields = ['subject']
     inlines = [QuestionInline]
     
     def question_count(self, obj):

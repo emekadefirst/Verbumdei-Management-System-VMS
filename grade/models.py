@@ -2,6 +2,7 @@ from django.db import models
 from django.core.exceptions import ValidationError
 from staff.models import Staff
 
+
 class Class(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=12, unique=True)
@@ -37,3 +38,5 @@ class SubjectMaterial(models.Model):
 
     def __str__(self):
         return f"Material for {self.subject.name} - {self.material.name}"
+
+

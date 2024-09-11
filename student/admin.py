@@ -1,6 +1,6 @@
 from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
-from .models import Student
+from .models import Student, Attendance
 from unfold.admin import ModelAdmin
 from import_export.admin import ImportExportModelAdmin
 from unfold.contrib.import_export.forms import ImportForm, ExportForm
@@ -14,3 +14,19 @@ class StudentAdmin(ModelAdmin, ImportExportModelAdmin):
     readonly_fields = ('registration_id', 'registration_date')
     import_form_class = ImportForm
     export_form_class = ExportForm
+
+
+@admin.register(Attendance)
+class AttendanceAdmin(admin.ModelAdmin):
+    list_display = ("student", "grade", "date", "present")
+    list_filter = ("grade", "date", "present")
+    search_fields = ("student__name", "grade__name")
+    date_hierarchy = "date"
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj:  # editing an existing object
+            return ("student", "grade", "date")
+        return ()
+
+    def has_delete_permission(self, request, obj=None):
+        return request.user.is_superuser

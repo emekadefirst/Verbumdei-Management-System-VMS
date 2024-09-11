@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "asessment",
     "inventory",
     "payment",
+    "subadmin",
 ]
 
 ROOT_URLCONF = 'server.urls'
@@ -93,15 +94,7 @@ STATICFILES_DIRS = ["static"]
 STATIC_ROOT =  "staticfiles"
 
 MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
-
-
-# if DEBUG:
-#     pass
-# else:
-
-
-# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = os.path.join("media")
 
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

@@ -44,3 +44,5 @@ class ClassCreateUpdateSerializer(serializers.ModelSerializer):
         if value.staff_type != 'TEACHING':
             raise serializers.ValidationError(f'Teacher {value} is not a teaching staff member.')
         return value
+
+

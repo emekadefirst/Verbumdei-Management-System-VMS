@@ -1,7 +1,7 @@
 from .base import *
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(override=True)
 
 SECRET_KEY = os.environ.get("PRODUCTION_KEY")
 
@@ -30,6 +30,7 @@ DATABASES = {
         "OPTIONS": {"sslmode": "require"},
     }
 }
+
 
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 

@@ -2,15 +2,21 @@ from django.db import models
 from datetime import datetime
 from django.db.models import Sum
 import uuid
-import csv
-from django.http import HttpResponse
+from server.cloud import cloud
+from io import BytesIO
+from io import BytesIO
+from django.utils.text import slugify
+
+
+
 
 def staff_registration_id(staff_type):
     now = datetime.now()
-    date_str = now.strftime('%Y%m%d')
-    time_str = now.strftime('%H%M%S')
-    prefix = 't' if staff_type == 'TEACHING' else 'n'
-    return f'{prefix}STF{date_str}{time_str}'
+    date_str = now.strftime("%Y%m%d")
+    time_str = now.strftime("%H%M%S")
+    prefix = "t" if staff_type == "TEACHING" else "n"
+    return f"{prefix}STF{date_str}{time_str}"
+
 
 class Staff(models.Model):
     class EMPLOYMENT_TYPE(models.TextChoices):
@@ -19,11 +25,11 @@ class Staff(models.Model):
         PART_TIME = "PART_TIME", "Part-time"
         INTERN = "INTERN", "Intern"
         CORPER = "CORPER", "Corper"
- 
+
     class STATUS(models.TextChoices):
         ACTIVE = "ACTIVE", "Active"
         INACTIVE = "INACTIVE", "Inactive"
-            
+
     class GENDER(models.TextChoices):
         MALE = "MALE", "Male"
         FEMALE = "FEMALE", "Female"
@@ -39,7 +45,7 @@ class Staff(models.Model):
     other_name = models.CharField(max_length=15, blank=True, null=True)
     phone_number_1 = models.CharField(max_length=15)
     phone_number_2 = models.CharField(max_length=15, blank=True, null=True)
-    email = models.EmailField(max_length=50, unique=True)
+    email = models.EmailField(max_length=100, unique=True)
     employment_type = models.CharField(max_length=20, choices=EMPLOYMENT_TYPE.choices)
     home_address = models.CharField(max_length=55)
     local_government_area = models.CharField(max_length=100)
@@ -50,20 +56,30 @@ class Staff(models.Model):
     staff_id = models.CharField(max_length=25, unique=True, blank=True)
     status = models.CharField(max_length=20, choices=STATUS.choices)
     position = models.CharField(max_length=20)
-    profile_img = models.ImageField(upload_to="Staff_profile/", blank=True, null=True)
+    upload = models.ImageField(upload_to="Staff_profile/", blank=True, null=True)
+    img_url = models.URLField(max_length=500, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    
-    class Meta:
-        ordering = ['-created_at']
-        
-    def __str__(self):
-        fullname = f'{self.first_name} {self.last_name} {self.other_name}'
-        return fullname.strip()
 
     def save(self, *args, **kwargs):
+        # Generate staff_id based on staff_type when the staff_id is not set
         if not self.staff_id:
             self.staff_id = staff_registration_id(self.staff_type)
+
+        # Process image upload and generate URL if not already set
+        if self.upload and not self.img_url:
+            sanitized_name = slugify(self.upload.name, allow_unicode=False)
+            image_data = BytesIO(self.upload.read())
+            self.img_url = cloud(image_data, sanitized_name)
+
         super().save(*args, **kwargs)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        fullname = f"{self.first_name} {self.last_name} {self.other_name}"
+        return fullname.strip()
+
 
 class AccountInfo(models.Model):
     staff = models.OneToOneField(Staff, on_delete=models.CASCADE, related_name='bank_account')
@@ -122,5 +138,3 @@ class Payroll(models.Model):
 
     def generate_transaction_reference(self):
         self.transaction_reference = f"PAY-{self.staff.staff_id}{self.pay_period.strftime('%Y%m%d')}{uuid.uuid4().hex[:6].upper()}"
-
-

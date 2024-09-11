@@ -4,3 +4,5 @@ __pycache__/
 app.py
 verbumdeiMS.db
 run.sh
+quiz/
+verbumdeiMS.db

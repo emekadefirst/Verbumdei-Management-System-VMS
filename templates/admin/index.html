@@ -16,15 +16,16 @@
         <button onclick="updateChart('year')">Last Year</button>
         <button onclick="updateChart('all')">All Time</button>
     </div>
+
     <!-- Charts -->
     <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
         <div style="padding: 15px; border: 1px solid #ddd; border-radius: 5px;">
             <h3>Payments Analytics</h3>
-            <canvas id="paymentTimeChart"></canvas>
+            <canvas id="paymentTimeChart" style="width: 100%; height: 300px;"></canvas>
         </div>
         <div style="padding: 15px; border: 1px solid #ddd; border-radius: 5px;">
             <h3>Student Registration Analytics</h3>
-            <canvas id="studentChart"></canvas>
+            <canvas id="studentChart" style="width: 100%; height: 300px;"></canvas>
         </div>
     </div>
 </div>
@@ -47,103 +48,107 @@
         </div>
     </div>
 </div>
+
+<!-- Audit Tray Section -->
 <div class="card mt-8">
     {% include "unfold/helpers/history.html" %}
 </div>
+
 <script>
     const COLORS = {
         primary: {
             "50": "rgba(235, 245, 255, 1)",
-            "100": "rgba(215, 235, 255, 1)",
-            "200": "rgba(176, 215, 255, 1)",
             "300": "rgba(137, 195, 255, 1)",
-            "400": "rgba(98, 175, 255, 1)",
             "500": "rgba(0, 0, 255, 1)",
             "600": "rgba(0, 0, 204, 1)",
-            "700": "rgba(0, 0, 153, 1)",
-            "800": "rgba(0, 0, 102, 1)",
-            "900": "rgba(0, 0, 51, 1)",
-            "950": "rgba(0, 0, 25, 1)"
+            "700": "rgba(0, 0, 153, 1)"
         }
     };
 
-    // Payment Time Chart
-    var ctxPayment = document.getElementById('paymentTimeChart').getContext('2d');
-    var paymentData = JSON.parse('{{ payments_last_7_days|default:"[]"|safe }}');
-    const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    const paymentAmounts = Array(7).fill(0);
+    // Parse data from the backend (payments and student registrations)
+    const paymentData = JSON.parse('{{ payments_last_7_days|default:"[]"|safe }}');
+    const studentData = JSON.parse('{{ student_registration_graph_data|default:"[]"|safe }}');
 
-    paymentData.forEach(item => {
-        const date = new Date(item.date);
-        const dayIndex = date.getDay();
-        paymentAmounts[dayIndex] += item.amount;
-    });
+    console.log('Payment Data:', paymentData);
+    console.log('Student Data:', studentData);
 
-    new Chart(ctxPayment, {
-        type: 'bar',
-        data: {
-            labels: daysOfWeek,
-            datasets: [{
-                label: 'Total Payment Amount',
-                data: paymentAmounts,
-                borderColor: COLORS.primary["500"],
-                backgroundColor: COLORS.primary["300"],
-                borderWidth: 1,
-                fill: true,
-                tension: 0.1
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    labels: {
-                        color: COLORS.primary["700"]
-                    }
-                }
+    // Function to create Payment chart
+    function createPaymentChart(data) {
+        const ctxPayment = document.getElementById('paymentTimeChart').getContext('2d');
+        const labels = data.map(item => item.date);
+        const values = data.map(item => item.amount);
+
+        return new Chart(ctxPayment, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Total Payment Amount',
+                    data: values,
+                    backgroundColor: COLORS.primary["300"],
+                    borderColor: COLORS.primary["500"],
+                    borderWidth: 1
+                }]
             },
-            scales: {
-                x: {
-                    ticks: { color: COLORS.primary["700"] }
+            options: {
+                scales: {
+                    x: { ticks: { color: COLORS.primary["700"] } },
+                    y: { ticks: { color: COLORS.primary["700"] }, beginAtZero: true }
                 },
-                y: {
-                    ticks: { color: COLORS.primary["700"] }
-                }
+                responsive: true,
             }
-        }
-    });
+        });
+    }
 
-    // Student Registration Chart
-    var ctxStudent = document.getElementById('studentChart').getContext('2d');
-    var studentData = JSON.parse('{{ student_registration_graph_data|default:"[]"|safe }}');
+    // Function to create Student Registration chart
+    function createStudentChart(data) {
+        const ctxStudent = document.getElementById('studentChart').getContext('2d');
+        const labels = data.map(item => item.date);
+        const values = data.map(item => item.count);
 
-    new Chart(ctxStudent, {
-        type: 'line',
-        data: {
-            labels: studentData.map(item => item.date),
-            datasets: [{
-                label: 'Number of Students',
-                data: studentData.map(item => item.count),
-                backgroundColor: COLORS.primary["300"],
-                borderColor: COLORS.primary["500"],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { display: false },
-                title: {
-                    display: true,
-                    text: 'Student Registration Analytics',
-                    color: COLORS.primary["600"]
-                }
+        return new Chart(ctxStudent, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Number of Students',
+                    data: values,
+                    backgroundColor: COLORS.primary["300"],
+                    borderColor: COLORS.primary["500"],
+                    borderWidth: 1
+                }]
             },
-            scales: {
-                y: { beginAtZero: true, ticks: { color: COLORS.primary["700"] } },
-                x: { ticks: { color: COLORS.primary["700"] } }
+            options: {
+                scales: {
+                    x: { ticks: { color: COLORS.primary["700"] } },
+                    y: { ticks: { color: COLORS.primary["700"] }, beginAtZero: true }
+                },
+                responsive: true,
             }
-        }
-    });
+        });
+    }
+
+    // Initialize charts with backend data
+    const paymentChart = createPaymentChart(paymentData);
+    const studentChart = createStudentChart(studentData);
+
+    // Update charts based on time range (if applicable)
+    function updateChart(timeRange) {
+        console.log("Updating charts for time range:", timeRange);
+
+        // Simulate fetching new data based on the time range selected (this could be done via AJAX in a real case)
+        let newPaymentData = paymentData;  // Replace this with logic for different ranges
+        let newStudentData = studentData;
+
+        // Update payment chart
+        paymentChart.data.labels = newPaymentData.map(item => item.date);
+        paymentChart.data.datasets[0].data = newPaymentData.map(item => item.amount);
+        paymentChart.update();
+
+        // Update student chart
+        studentChart.data.labels = newStudentData.map(item => item.date);
+        studentChart.data.datasets[0].data = newStudentData.map(item => item.count);
+        studentChart.update();
+    }
 </script>
 {% endblock %}

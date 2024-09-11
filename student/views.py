@@ -1,8 +1,12 @@
+from rest_framework import viewsets
+from rest_framework.response import Response
+from rest_framework.decorators import action
+from .serializers import AttendanceSerializer
 from django.http import Http404
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .models import Student
+from .models import *
 from django.db.models import Q
 from django.db.models.functions import Lower
 from .serializers import StudentSerializer
@@ -67,3 +71,38 @@ class StudentSearch(APIView):
             return Response(serializer.data)
         else:
             return Response("Invalid search query", status=status.HTTP_400_BAD_REQUEST)
+
+
+class AttendanceViewSet(viewsets.ModelViewSet):
+    queryset = Attendance.objects.all()
+    serializer_class = AttendanceSerializer
+
+    @action(detail=False, methods=["post"])
+    def mark_attendance(self, request):
+        student_id = request.data.get("student_id")
+        class_id = request.data.get("class_id")
+        date = request.data.get("date")
+        present = request.data.get("present", False)
+
+        student = Student.objects.get(id=student_id)
+        class_attended = Class.objects.get(id=class_id)
+
+        attendance, created = Attendance.objects.get_or_create(
+            student=student,
+            class_attended=class_attended,
+            date=date,
+            defaults={"present": present},
+        )
+
+        if not created:
+            attendance.present = present
+            attendance.save()
+
+        return Response({"status": "Attendance recorded successfully"})
+
+    @action(detail=True, methods=["get"])
+    def student_attendance(self, request, pk=None):
+        student = Student.objects.get(pk=pk)
+        attendances = student.attendances.all()
+        serializer = self.get_serializer(attendances, many=True)
+        return Response(serializer.data)
