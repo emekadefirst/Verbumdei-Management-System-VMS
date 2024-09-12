@@ -35,7 +35,7 @@ DATABASES = {
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 
-CORS_ALLOWED_ORIGINS = ["http://127.0.0.1:5500", "http://localhost:3000"]
+CORS_ALLOWED_ORIGINS = ["http://127.0.0.1:5500", "http://localhost:3000", "https://test-nine-umber-83.vercel.app"]
 
 CORS_ALLOW_ALL_ORIGINS = True
 
