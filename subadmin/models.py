@@ -1,32 +1,24 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from datetime import datetime
-from staff.models import Staff
-
-
-def admin_id():
-    now = datetime.now()
-    date_str = now.strftime("%Y%m%d")
-    time_str = now.strftime("%H%M%S")
-    return f"AD{date_str}{time_str}"
 
 
 class SubAdmin(AbstractUser):
-    staff = models.OneToOneField(Staff, on_delete=models.CASCADE, null=True, blank=True)
+    staff_id = models.CharField(max_length=25, default=None, null=True, blank=True)
     admin_id = models.CharField(
-        max_length=25, default=admin_id, unique=True, null=True, blank=True
-    )
+        max_length=25, default=None, null=True, blank=True
+    )  # Add this field to store the admin_id
     created_at = models.DateTimeField(auto_now_add=True)
-
-    # Add related_name to avoid clashes with auth.User model
     groups = models.ManyToManyField(
-        "auth.Group", related_name="subadmin_groups", blank=True  # Custom related_name
+        "auth.Group", related_name="subadmin_groups", blank=True
     )
     user_permissions = models.ManyToManyField(
-        "auth.Permission",
-        related_name="subadmin_user_permissions",  # Custom related_name
-        blank=True,
+        "auth.Permission", related_name="subadmin_user_permissions", blank=True
     )
+
+    def save(self, *args, **kwargs):
+        if not self.admin_id:
+            self.admin_id = self.staff_id
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.username} - {self.admin_id}"

@@ -12,14 +12,13 @@ class SubAdminAdmin(UserAdmin):
         "first_name",
         "last_name",
         "email",
-        "admin_id",
-        "staff",
+        "staff_id",
         "created_at",
         "is_staff",
     )
 
     # Fields to filter the list view
-    list_filter = ("is_staff", "is_superuser", "is_active", "staff")
+    list_filter = ("is_staff", "is_superuser", "is_active", "staff_id")
 
     # Fields that can be searched
     search_fields = (
@@ -36,7 +35,7 @@ class SubAdminAdmin(UserAdmin):
         (None, {"fields": ("username", "password")}),
         (
             "Personal info",
-            {"fields": ("first_name", "last_name", "email", "admin_id", "staff")},
+            {"fields": ("first_name", "last_name", "email", "admin_id", "staff_id")},
         ),
         (
             "Permissions",
