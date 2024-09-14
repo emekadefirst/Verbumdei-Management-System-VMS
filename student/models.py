@@ -44,8 +44,9 @@ class Student(models.Model):
             sanitized_name = slugify(self.upload.name, allow_unicode=False)
             image_data = BytesIO(self.upload.read())
             self.img_url = cloud(image_data, sanitized_name)
+            self.upload.delete(save=False)
         super().save(*args, **kwargs)
-    
+
     class Meta:
         ordering = ['-registration_date']
 

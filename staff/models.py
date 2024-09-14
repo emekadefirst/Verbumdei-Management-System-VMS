@@ -7,8 +7,6 @@ from io import BytesIO
 from django.utils.text import slugify
 
 
-
-
 def staff_registration_id(staff_type):
     now = datetime.now()
     date_str = now.strftime("%Y%m%d")
@@ -66,7 +64,7 @@ class Staff(models.Model):
             sanitized_name = slugify(self.upload.name, allow_unicode=False)
             image_data = BytesIO(self.upload.read())
             self.img_url = cloud(image_data, sanitized_name)
-
+            self.upload.delete(save=False)
         super().save(*args, **kwargs)
 
     class Meta:
