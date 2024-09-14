@@ -5,6 +5,7 @@ class ParentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Parent
         fields = [
+            "id",
             "email",
             "phone_number_1",
             "phone_number_2",
@@ -12,7 +13,7 @@ class ParentSerializer(serializers.ModelSerializer):
             "home_address",
             "code",  # Add this field
         ]
-        read_only_fields = ["code"]
+        read_only_fields = ["id", "code"]
 
     def create(self, validated_data):
         parent = Parent.objects.create(**validated_data)

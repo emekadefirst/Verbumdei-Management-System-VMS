@@ -4,7 +4,6 @@ from django.db.models import Sum
 import uuid
 from server.cloud import cloud
 from io import BytesIO
-from io import BytesIO
 from django.utils.text import slugify
 
 
@@ -61,11 +60,8 @@ class Staff(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
-        # Generate staff_id based on staff_type when the staff_id is not set
         if not self.staff_id:
             self.staff_id = staff_registration_id(self.staff_type)
-
-        # Process image upload and generate URL if not already set
         if self.upload and not self.img_url:
             sanitized_name = slugify(self.upload.name, allow_unicode=False)
             image_data = BytesIO(self.upload.read())

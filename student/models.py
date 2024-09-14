@@ -35,7 +35,7 @@ class Student(models.Model):
     parent = models.ForeignKey(Parent, on_delete=models.CASCADE)
     religion = models.CharField(max_length=20)
     class_assigned = models.ForeignKey(Class, on_delete=models.SET_NULL, null=True)
-    upload = models.ImageField(upload_to="Student_profile/")
+    upload = models.ImageField(upload_to="Student_profile/", null=True, blank=True)
     img_url = models.URLField(max_length=500, blank=True)
     registration_date = models.DateTimeField(auto_now=True)
 

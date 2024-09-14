@@ -12,6 +12,7 @@ class StudentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student
         fields = [
+            "id",
             "registration_id",  # Add this field to the serializer
             "first_name",
             "other_name",
@@ -30,7 +31,7 @@ class StudentSerializer(serializers.ModelSerializer):
             "class_assigned",
         ]
 
-        read_only_fields = ("registration_id", "registration_date", "profile_image")
+        read_only_fields = ("id", "registration_id", "registration_date", "profile_image")
 
     def validate_parent(self, value):
         try:
@@ -54,6 +55,9 @@ class StudentSerializer(serializers.ModelSerializer):
         return Student.objects.create(
             parent=parent, class_assigned=class_assigned, **validated_data
         )
+        
+    def update(self, instance, validated_data):
+        return super().update(instance, validated_data)
 
 
 class AttendanceSerializer(serializers.ModelSerializer):
