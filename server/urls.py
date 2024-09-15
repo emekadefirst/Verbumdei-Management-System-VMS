@@ -46,6 +46,8 @@ urlpatterns = [
     path("payment/", include("payment.urls")),
     path("asessment/", include("asessment.urls")),
     path("api/", include(router.urls)),
-    path('subadmin/', include('subadmin.urls')),
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-
+    path("subadmin/", include("subadmin.urls")),
+    path("teacheradmin/", include("teacheradmin.urls")),
+] 
+if settings.DEBUG == False:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

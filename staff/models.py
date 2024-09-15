@@ -5,6 +5,7 @@ import uuid
 from server.cloud import cloud
 from io import BytesIO
 from django.utils.text import slugify
+from django.contrib.auth.models import AbstractUser
 
 
 def staff_registration_id(staff_type):
@@ -132,3 +133,25 @@ class Payroll(models.Model):
 
     def generate_transaction_reference(self):
         self.transaction_reference = f"PAY-{self.staff.staff_id}{self.pay_period.strftime('%Y%m%d')}{uuid.uuid4().hex[:6].upper()}"
+
+
+class TeacherAdmin(AbstractUser):
+    staff_id = models.CharField(max_length=25, default=None, null=True, blank=True)
+    admin_id = models.CharField(
+        max_length=25, default=None, null=True, blank=True
+    ) 
+    created_at = models.DateTimeField(auto_now_add=True)
+    groups = models.ManyToManyField(
+        "auth.Group", related_name="teacheradmin_groups", blank=True
+    )
+    user_permissions = models.ManyToManyField(
+        "auth.Permission", related_name="teacheradmin_user_permissions", blank=True
+    )
+
+    def save(self, *args, **kwargs):
+        if not self.admin_id:
+            self.admin_id = self.staff_id
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.username} - {self.admin_id}"

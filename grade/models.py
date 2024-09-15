@@ -1,6 +1,10 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 from staff.models import Staff
+from server.cloud import cloud_doc, cloud
+from io import BytesIO
+from django.utils.text import slugify
+from django.contrib.auth.models import AbstractUser
 
 
 class Class(models.Model):
@@ -30,13 +34,28 @@ class Subject(models.Model):
     def __str__(self):
         return self.name
 
+
 class SubjectMaterial(models.Model):
     id = models.AutoField(primary_key=True)
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name='study_materials')
-    material = models.FileField(upload_to='study_materials/')
+    upload = models.FileField(upload_to="Subject_material/", blank=True, null=True)
+    material_url = models.URLField(max_length=500, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def save(self, *args, **kwargs):
+        if self.upload:
+            if not self.material_url:
+                upload_file = self.upload.read()
+                sanitized_name = slugify(self.upload.name, allow_unicode=False)
+                file_url = cloud_doc(BytesIO(upload_file), sanitized_name)
+                if file_url:
+                    self.material_url = file_url
+                self.upload.delete(save=False)
+
+        super().save(*args, **kwargs)
+
     def __str__(self):
-        return f"Material for {self.subject.name} - {self.material.name}"
+        return f"Material for {self.subject.name} - {self.material_url}"
 
-
+    def __str__(self):
+        return f"Material for {self.subject.name} - {self.material_url}"

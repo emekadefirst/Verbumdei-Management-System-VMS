@@ -1,10 +1,9 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import SubAdmin
+from .models import TeacherAdmin
 
 
-
-class SubAdminAdmin(UserAdmin):
+class TeacherAdminAdmin(UserAdmin):
     list_display = (
         "username",
         "first_name",
@@ -22,7 +21,7 @@ class SubAdminAdmin(UserAdmin):
         "first_name",
         "last_name",
         "email",
-        "admin_id",
+        "teacher_id",
         "staff__staff_id",
     )
 
@@ -30,7 +29,7 @@ class SubAdminAdmin(UserAdmin):
         (None, {"fields": ("username", "password")}),
         (
             "Personal info",
-            {"fields": ("first_name", "last_name", "email", "admin_id", "staff_id")},
+            {"fields": ("first_name", "last_name", "email", "teacher_id", "staff_id")},
         ),
         (
             "Permissions",
@@ -59,7 +58,6 @@ class SubAdminAdmin(UserAdmin):
                     "email",
                     "password1",
                     "password2",
-                    "staff",
                     "is_active",
                     "is_staff",
                     "is_superuser",
@@ -69,9 +67,8 @@ class SubAdminAdmin(UserAdmin):
     )
 
     ordering = ("username",)
-
-    # Displays the field for staff association in the admin form
     def staff(self, obj):
         return obj.staff.staff_id if obj.staff else None
 
-admin.site.register(SubAdmin, SubAdminAdmin)
+
+admin.site.register(TeacherAdmin, TeacherAdminAdmin)

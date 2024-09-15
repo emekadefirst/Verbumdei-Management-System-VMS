@@ -22,15 +22,13 @@ class SubjectAdmin(ModelAdmin, ImportExportModelAdmin):
     import_form_class = ImportForm
     export_form_class = SelectableFieldsExportForm  
 
-class SubjectMaterialAdmin(ModelAdmin, ImportExportModelAdmin):
-    list_display = ('subject', 'material', 'created_at')
-    search_fields = ('subject__name', 'material')
-    list_filter = ('subject', 'created_at')
-    ordering = ['-created_at']
-    readonly_fields = ['created_at']
-    import_form_class = ImportForm
-    export_form_class = SelectableFieldsExportForm  
+from django.contrib import admin
+from .models import SubjectMaterial
 
+
+class SubjectMaterialAdmin(admin.ModelAdmin):
+    list_display = ("subject", "upload", "material_url", "created_at")
+    search_fields = ("subject__name",)
 
 admin.site.register(SubjectMaterial, SubjectMaterialAdmin)
 admin.site.register(Subject, SubjectAdmin)

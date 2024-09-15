@@ -24,3 +24,19 @@ def cloud(file, name: str):
     except Exception as e:
         print(f"An error occurred during upload: {str(e)}")
         return None
+
+
+def cloud_doc(file, name: str):
+    try:
+        upload_result = cloudinary.uploader.upload(
+            file,
+            public_id=name,
+            resource_type="auto", 
+            use_filename=True,
+            unique_filename=False,
+            pages = True
+        )
+        return upload_result["secure_url"]
+    except Exception as e:
+        print(f"An error occurred during upload: {str(e)}")
+        return None
