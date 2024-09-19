@@ -9,11 +9,6 @@ from drf_yasg import openapi
 from student.views import AttendanceViewSet
 from rest_framework.routers import DefaultRouter
 from django.conf.urls.static import static
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-)
-
 
 router = DefaultRouter()
 router.register(r"attendance", AttendanceViewSet)
@@ -52,8 +47,6 @@ urlpatterns = [
     path("api/", include(router.urls)),
     path("subadmin/", include("subadmin.urls")),
     path("teacheradmin/", include("teacheradmin.urls")),
-    path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
-    path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
 ]
 if settings.DEBUG == False:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
