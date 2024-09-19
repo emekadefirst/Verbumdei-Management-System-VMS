@@ -18,7 +18,7 @@ class Quiz(models.Model):
 
 
     def __str__(self):
-        return self.subject.name
+        return f"{self.subject.name} {self.type}"
 
 class Question(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name='questions')

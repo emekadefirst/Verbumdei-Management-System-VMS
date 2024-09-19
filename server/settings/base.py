@@ -24,10 +24,12 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # packages
     "drf_yasg",
     "import_export",
     "rest_framework",
     "corsheaders",
+    "rest_framework.authtoken",
     # installed Apps
     "staff",
     "student",
@@ -39,6 +41,7 @@ INSTALLED_APPS = [
     "payment",
     "subadmin",
     "teacheradmin",
+    "term",
 ]
 
 ROOT_URLCONF = 'server.urls'
@@ -78,10 +81,10 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# # Ensure email addresses are unique
-# AUTHENTICATION_BACKENDS = [
-#     "django.contrib.auth.backends.ModelBackend",
-# ]
+# Ensure email addresses are unique
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+]
 
 AUTH_USER_MODEL = "subadmin.SubAdmin"  
 
@@ -107,30 +110,30 @@ UNFOLD = {
     "SITE_HEADER": "Verbumdei Super Admin",
     "SITE_LOGO": lambda request: static("logo.jpeg"),
     "SITE_URL": "/",
-    "SITE_ICON": lambda request: static("logo.jpeg"),    
+    "SITE_ICON": lambda request: static("logo.jpeg"),
     "SHOW_HISTORY": True,
     "SHOW_VIEW_ON_SITE": True,
     "THEME": True,
     "SIDEBAR": {
         "show_search": True,
-    }
-,    "COLORS": {
+    },
+    "COLORS": {
         "primary": {
             "50": "235 245 255",
             "100": "215 235 255",
             "200": "176 215 255",
             "300": "137 195 255",
             "400": "98 175 255",
-            "500": "0 0 255", 
+            "500": "0 0 255",
             "600": "0 0 204",
             "700": "0 0 153",
             "800": "0 0 102",
             "900": "0 0 51",
-            "950": "0 0 25"
+            "950": "0 0 25",
         }
-},
-
-"SITE_FAVICONS": [
+    },
+    "DASHBOARD_CALLBACK": "server.utils.dashboard_callback",  # Move this out of COLORS
+    "SITE_FAVICONS": [
         {
             "rel": "icon",
             "sizes": "32x32",
@@ -139,3 +142,14 @@ UNFOLD = {
         },
     ],
 }
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.TokenAuthentication", 
+    ],
+
+}
+
+# "DEFAULT_PERMISSION_CLASSES": [
+#     "rest_framework.permissions.IsAuthenticated",
+# ],

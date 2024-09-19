@@ -5,7 +5,7 @@ from django.db import models
 class SubAdmin(AbstractUser):
     staff_id = models.CharField(max_length=25, default=None, null=True, blank=True)
     admin_id = models.CharField(
-        max_length=25, default=None, null=True, blank=True
+        max_length=25, default=None, null=True, blank=True, unique=True
     )  # Add this field to store the admin_id
     created_at = models.DateTimeField(auto_now_add=True)
     groups = models.ManyToManyField(
