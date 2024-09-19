@@ -50,12 +50,16 @@ def dashboard_callback(request, context=None):
         Payment.objects.aggregate(total=Sum("payment_type__amount"))["total"] or 0
     )
 
+    # Get the total count of students
+    total_students = Student.objects.count()
+
     # Prepare the new context data
     new_context = {
         "payments_last_7_days": json.dumps(payments_data),
         "student_registration_graph_data": json.dumps(student_data),
         "total_staff": total_staff,
         "total_payments": total_payments,
+        "total_students": total_students,  # Add the total student count
     }
 
     # If a context was provided, update it with our new data
