@@ -13,4 +13,4 @@ class Term(models.Model):
     )
 
     def __str__(self):
-        return f"{self.term} - {self.section}"
+        return f"{self.term} - {self.session}"
