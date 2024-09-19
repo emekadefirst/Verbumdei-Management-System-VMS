@@ -1,13 +1,15 @@
 from .models import TeacherAdmin
-from django.contrib.auth import login
 from .serializers import TeacherSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from django.contrib.auth import logout
+from django.contrib.auth import logout, login
 from staff.models import Staff
 from grade.models import Subject, Class, SubjectMaterial
 from student.models import Student
+from rest_framework.authtoken.models import Token
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.authentication import TokenAuthentication
 
 
 class TeacherView(APIView):
@@ -20,6 +22,7 @@ class TeacherView(APIView):
 
 
 class TeacherLoginView(APIView):
+    permission_classes = [AllowAny]
     def post(self, request, format=None):
         teacher_id = request.data.get("teacher_id")
         password = request.data.get("password")
@@ -38,8 +41,6 @@ class TeacherLoginView(APIView):
             user = TeacherAdmin.objects.get(teacher_id=teacher_id)
             staff_profile = Staff.objects.get(staff_id=teacher_id)
             profile_image = staff_profile.img_url
-
-            # Retrieve class information
             try:
                 class_profile = Class.objects.get(teacher=staff_profile)
                 class_name = class_profile.name
@@ -47,8 +48,6 @@ class TeacherLoginView(APIView):
             except Class.DoesNotExist:
                 class_name = None
                 class_instance = None
-
-            # Retrieve students by class
             if class_instance:
                 students = Student.objects.filter(class_assigned=class_instance)
                 student_count = students.count()
@@ -62,7 +61,6 @@ class TeacherLoginView(APIView):
                 student_profile_images = []
                 student_count = 0
 
-            # Retrieve subjects and their materials
             subjects_assigned = Subject.objects.filter(teacher=staff_profile)
             subject_names = [subject.name for subject in subjects_assigned]
 
@@ -83,17 +81,13 @@ class TeacherLoginView(APIView):
                 {"error": "Profile not found."}, status=status.HTTP_404_NOT_FOUND
             )
 
-        # Verify password
+
         if not user.check_password(password):
             return Response(
                 {"error": "Invalid credentials, please try again."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-
-        # Log the user in
         login(request, user)
-
-        # Prepare the response data
         serializer = TeacherSerializer(user)
         user_data = serializer.data
         user_data.update(
@@ -107,14 +101,26 @@ class TeacherLoginView(APIView):
                 "subject_material": materials,
             }
         )
-
+        token, created = Token.objects.get_or_create(user=user)
         return Response(
-            {"user": user_data, "message": "Login successful"},
+            {"token": token.key, "user": user_data, "message": "Login successful"},
             status=status.HTTP_200_OK,
         )
 
 
 class LogoutView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def post(self, request, format=None):
+        try:
+            token = Token.objects.get(user=request.user)
+            token.delete()
+        except Token.DoesNotExist:
+            return Response(
+                {"error": "Invalid token or already logged out."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         logout(request)
+
         return Response({"message": "Logout successful"}, status=status.HTTP_200_OK)
