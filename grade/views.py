@@ -68,10 +68,10 @@ class SubjectRetrieveUpdateDestroyAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request, pk):
-        subject = get_object_or_404(Subject, pk=pk)
-        subject.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+class SubjectCount(APIView):
+    def get(self, request):
+        data = Subject.objects.count()
+        return Response({"count": data})
 
 class SubjectMaterialListCreateAPIView(APIView):
     def get(self, request):
