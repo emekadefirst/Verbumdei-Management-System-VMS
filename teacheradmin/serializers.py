@@ -8,6 +8,7 @@ def userId(firstname):
     now = datetime.now()
     return f"{firstname}{now.strftime('%M%S')}"
 
+
 class TeacherSerializer(serializers.ModelSerializer):
     class Meta:
         model = TeacherAdmin
@@ -33,11 +34,11 @@ class TeacherSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         staff_id = validated_data.get("staff_id")
+
         try:
             staff = Staff.objects.get(staff_id=staff_id)
         except Staff.DoesNotExist:
             raise serializers.ValidationError({"error": "Staff ID does not exist"})
-
         first_name = staff.first_name
         last_name = staff.last_name
         email = staff.email
@@ -47,12 +48,9 @@ class TeacherSerializer(serializers.ModelSerializer):
         validated_data["last_name"] = last_name
         validated_data["email"] = email
         validated_data["username"] = username
-
         password = validated_data.pop("password", None)
         teacher_admin = TeacherAdmin.objects.create(**validated_data)
-
         if password:
             teacher_admin.set_password(password)
             teacher_admin.save()
-
-        return teacher_admin
+            return teacher_admin
