@@ -65,7 +65,6 @@ class StudentSearch(APIView):
 
             search_results = search_results.order_by("registration_id")
             serializer = StudentSerializer(search_results, many=True)
-            print(f"Search results: {serializer.data}")
             return Response(serializer.data)
         else:
             return Response("Invalid search query", status=status.HTTP_400_BAD_REQUEST)

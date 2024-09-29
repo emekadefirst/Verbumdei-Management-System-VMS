@@ -14,7 +14,7 @@ adminv2.
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-DEBUG = True
+DEBUG = False
 
 INSTALLED_APPS = [
     "unfold",
@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     "subadmin",
     "teacheradmin",
     "term",
-    "studentattendance"
+    "studentattendance",
+    "hostelmanagement",
 ]
 
 ROOT_URLCONF = 'server.urls'

@@ -39,8 +39,9 @@ urlpatterns = [
     path("payment/", include("payment.urls")),
     path("asessment/", include("asessment.urls")),
     path("subadmin/", include("subadmin.urls")),
-    path('attendance/', include("studentattendance.urls")),
+    path("attendance/", include("studentattendance.urls")),
     path("teacheradmin/", include("teacheradmin.urls")),
+    path("hostel/", include("hostelmanagement.urls")),
 ]
 if settings.DEBUG == False:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
