@@ -10,7 +10,7 @@ django-admin-material-dashboard==1.0.10
 django-cors-headers==4.4.0
 django-import-export==4.1.1
 django-unfold==0.36.0
-djangorestframework==3.13.0
+djangorestframework==3.15.0
 drf-yasg==1.21.7
 gunicorn==23.0.0
 idna==3.7
@@ -33,7 +33,5 @@ tablib==3.5.0
 tzdata==2024.1
 uritemplate==4.1.1
 urllib3==2.2.2
-waitress==3.0.0
 whitenoise==6.7.0
-pymysql
-mysqlclient
+
