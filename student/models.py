@@ -54,23 +54,3 @@ class Student(models.Model):
         return f'{self.last_name} - {self.registration_id}'
 
 
-class Attendance(models.Model):
-    id = models.AutoField(primary_key=True)
-    student = models.ForeignKey(
-        Student, on_delete=models.CASCADE, related_name="attendances"
-    )
-    grade = models.ForeignKey(
-        Class, on_delete=models.CASCADE, related_name="attendances"
-    )
-    date = models.DateField()
-    present = models.BooleanField(default=False)
-
-    class Meta:
-        unique_together = (
-            "student",
-            "grade",
-            "date",
-        )
-
-    def __str__(self):
-        return f"Attendance for {self.student.name} in {self.grade.name} on {self.date}"

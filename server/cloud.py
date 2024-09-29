@@ -13,6 +13,13 @@ cloudinary.config(
     secure=True,
 )
 
+cloudinary.config(
+    cloud_name="dtvitql5p",
+    api_key="392413349178751",
+    api_secret="v6spZ192qk70o97uhikyIb2kjmw ",
+    secure=True,
+)
+
 def cloud(file, name: str):
     try:
         upload_result = cloudinary.uploader.upload(file, public_id=name)

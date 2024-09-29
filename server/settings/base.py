@@ -14,7 +14,7 @@ adminv2.
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-DEBUG = False
+DEBUG = True
 
 INSTALLED_APPS = [
     "unfold",
@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "subadmin",
     "teacheradmin",
     "term",
+    "studentattendance"
 ]
 
 ROOT_URLCONF = 'server.urls'
@@ -162,14 +163,4 @@ REST_FRAMEWORK = {
 #     }
 # }
 
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.postgresql",
-#         "NAME": os.environ.get("DATABASE_NAME"),
-#         "USER": os.environ.get("DATABASE_USER"),
-#         "PASSWORD": os.environ.get("DATABASE_PASSWORD"),
-#         "HOST": os.environ.get("DATABASE_HOST"),
-#         "PORT": 5432,
-#         # "OPTIONS": {"sslmode": "require"},
-#     }
-# }
+

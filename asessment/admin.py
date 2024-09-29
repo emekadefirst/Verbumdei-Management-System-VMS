@@ -18,14 +18,11 @@ class QuestionInline(admin.StackedInline):
 
 @admin.register(Quiz)
 class QuizAdmin(admin.ModelAdmin):
-    list_display = ('subject', 'type', 'question_count', 'is_active', 'time_limit', 'created_at')
+    list_display = ('subject', 'type', 'is_active', 'time_limit', 'created_at')
     list_filter = ('type', 'is_active', 'created_at')
     search_fields = ['subject']
     inlines = [QuestionInline]
     
-    def question_count(self, obj):
-        return obj.questions.count()
-    question_count.short_description = 'Number of Questions'
 
 class StudentAnswerInline(admin.TabularInline):
     model = StudentAnswer

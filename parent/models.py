@@ -8,7 +8,7 @@ def parent_id():
     time_str = now.strftime("%H%M%S")
     return f"vb{date_str}pa{time_str}"
 
-
+models.Model
 
 class Parent(models.Model):
     id = models.AutoField(primary_key=True)

@@ -4,12 +4,8 @@ from django.conf import settings
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
-from student.views import AttendanceViewSet
 from rest_framework.routers import DefaultRouter
 from django.conf.urls.static import static
-
-router = DefaultRouter()
-router.register(r"attendance", AttendanceViewSet)
 
 
 schema_view = get_schema_view(
@@ -42,8 +38,8 @@ urlpatterns = [
     path("class/", include("grade.urls")),
     path("payment/", include("payment.urls")),
     path("asessment/", include("asessment.urls")),
-    path("api/", include(router.urls)),
     path("subadmin/", include("subadmin.urls")),
+    path('attendance/', include("studentattendance.urls")),
     path("teacheradmin/", include("teacheradmin.urls")),
 ]
 if settings.DEBUG == False:
