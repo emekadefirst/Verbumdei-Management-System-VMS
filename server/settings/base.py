@@ -1,5 +1,4 @@
 import os
-from dotenv import load_dotenv
 from pathlib import Path
 from django.templatetags.static import static
 from django.urls import reverse_lazy
@@ -14,7 +13,7 @@ adminv2.
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-DEBUG = False
+DEBUG = True
 
 INSTALLED_APPS = [
     "unfold",
@@ -152,16 +151,5 @@ REST_FRAMEWORK = {
 
 }
 
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'database name ',
-#         'USER': 'database username ',
-#         'PASSWORD': 'database password',
-#         'HOST': 'localhost',
-#         'PORT': '3306',
-#     }
-# }
 
 

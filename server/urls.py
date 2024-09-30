@@ -42,6 +42,7 @@ urlpatterns = [
     path("attendance/", include("studentattendance.urls")),
     path("teacheradmin/", include("teacheradmin.urls")),
     path("hostel/", include("hostelmanagement.urls")),
+    path("transport/", include("transport.urls")),
 ]
 if settings.DEBUG == False:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
