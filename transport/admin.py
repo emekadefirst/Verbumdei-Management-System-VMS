@@ -30,20 +30,10 @@ class BusAdmin(admin.ModelAdmin):
 
 @admin.register(Commute)
 class CommuteAdmin(admin.ModelAdmin):
-    list_display = ["uuid", "bus", "get_student_count", "is_full"]
+    list_display = ["uuid", "bus", "is_full"]
     search_fields = ["bus__plate_number", "uuid"]
+    readonly_fields = ["uuid"]
     list_filter = ["bus"]
     ordering = ["-uuid"]
-    filter_horizontal = ["student"]  
-    fields = ["uuid", "bus", "student"]
-
-    def get_student_count(self, obj):
-        return obj.student.count()
-
-    get_student_count.short_description = "Number of Students"
-
-    def is_full(self, obj):
-        return obj.is_full
-
-    is_full.boolean = True
-    is_full.short_description = "Is Full"
+    filter_horizontal = ["students"]  
+    fields = ["uuid", "bus", "students"]

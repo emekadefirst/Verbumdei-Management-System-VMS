@@ -41,7 +41,7 @@ urlpatterns = [
     path("subadmin/", include("subadmin.urls")),
     path("attendance/", include("studentattendance.urls")),
     path("teacheradmin/", include("teacheradmin.urls")),
-    path("hostel/", include("hostelmanagement.urls")),
+    path("dormitary/", include("Dormitary.urls")),
     path("transport/", include("transport.urls")),
 ]
 if settings.DEBUG == False:

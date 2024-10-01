@@ -2,12 +2,13 @@ from staff.models import Staff
 from .models import Bus, Commute
 from student.models import Student
 from rest_framework import serializers
+from rest_framework.validators import ValidationError
 
 
 class StaffSerializer(serializers.ModelSerializer):
     class Meta:
         model = Staff
-        fields = ["staff_id"]
+        fields = ["staff_id", "first_name", "last_name"]
 
     def validate_staff_id(self, value):
         try:
@@ -35,29 +36,93 @@ class StudentSerializer(serializers.ModelSerializer):
 
         return value
 
+
+class BusSerializer(serializers.ModelSerializer):
+    driver = StaffSerializer()
+    class Meta:
+        model = Bus
+        fields = ["plate_number", "driver"]
+
+
+class StudentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Student
+        fields = ["registration_id", "first_name", "last_name"] 
+
+
 class CommuteSerializer(serializers.ModelSerializer):
-    bus = serializers.CharField(source="bus.plate_number", read_only=True) 
-    bus_id = serializers.PrimaryKeyRelatedField(queryset=Bus.objects.all(), source="bus")  
-    students = serializers.PrimaryKeyRelatedField(queryset=Student.objects.all(), many=True) 
-    is_full = serializers.ReadOnlyField()  
+    bus = serializers.CharField(write_only=True)
+    students = serializers.CharField(write_only=True)
+
+    bus_details = BusSerializer(source="bus", read_only=True)
+    student_details = StudentSerializer(source="students", many=True, read_only=True)
+
     class Meta:
         model = Commute
-        fields = ["uuid", "bus", "bus_id", "students", "is_full"]
+        fields = ["bus", "students", "bus_details", "student_details"]
 
     def create(self, validated_data):
-        parent = Commute.objects.create(**validated_data)
-        return parent
+        bus_plate_number = validated_data.pop("bus")
+        student_id = validated_data.pop("students")
+        try:
+            bus = Bus.objects.get(plate_number=bus_plate_number)
+        except Bus.DoesNotExist:
+            raise serializers.ValidationError(
+                f"Bus with plate number {bus_plate_number} does not exist."
+            )
+        try:
+            student = Student.objects.get(registration_id=student_id)
+        except Student.DoesNotExist:
+            raise serializers.ValidationError(
+                f"Student with registration ID {student_id} does not exist."
+            )
+
+        commute = Commute.objects.create(bus=bus, **validated_data)
+        commute.students.set([student])
+
+        return commute
+
 
     def update(self, instance, validated_data):
-        return super().update(instance, validated_data)
+        if "bus" in validated_data:
+            bus_plate_number = validated_data.pop("bus")
+            try:
+                new_bus = Bus.objects.get(plate_number=bus_plate_number)
+                instance.bus = new_bus
+            except Bus.DoesNotExist:
+                raise serializers.ValidationError(
+                    f"Bus with plate number {bus_plate_number} does not exist."
+                )
 
-    # def validate_students(self, value):
-    #     """
-    #     Check if bus is not full before adding more students.
-    #     """
-    #     bus = self.instance.bus if self.instance else self.initial_data.get("bus")
-    #     if bus.sit_capacity < len(value):
-    #         raise serializers.ValidationError(
-    #             f"The bus with plate number {bus.plate_number} has reached full capacity."
-    #         )
-    #     return value
+        if "students" in validated_data:
+            student_id = validated_data.pop("students")
+            try:
+                student = Student.objects.get(registration_id=student_id)
+                if instance.is_full:
+                    raise serializers.ValidationError(
+                        f"The bus {instance.bus.plate_number} is full."
+                    )
+                instance.add_student(student)
+            except Student.DoesNotExist:
+                raise serializers.ValidationError(
+                    f"Student with registration ID {student_id} does not exist."
+                )
+            except ValidationError as e:
+                raise serializers.ValidationError(str(e))
+
+        instance.save()
+        return instance
+
+
+class GetCommuteSerializer(serializers.ModelSerializer):
+    bus = BusSerializer()
+    students = StudentSerializer(many=True)
+    is_full = serializers.BooleanField()  
+    class Meta:
+        model = Commute
+        fields = ["id", "uuid", "bus", "students", "is_full"]
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation["students_count"] = instance.students.count()
+        return representation

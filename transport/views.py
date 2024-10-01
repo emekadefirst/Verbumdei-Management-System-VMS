@@ -1,5 +1,5 @@
-from .serializers import CommuteSerializer
-from .bus_serializer import BusSerializer
+from .serializers import CommuteSerializer, GetCommuteSerializer
+from .bus_serializer import BusSerializer, GetBusSerializer
 from .models import Bus, Commute
 from django.http import Http404
 from rest_framework import status
@@ -10,7 +10,7 @@ from rest_framework.response import Response
 class BusView(APIView):
     def get(self, request, format=None): 
         bus = Bus.objects.all()
-        serializer = BusSerializer(bus, many=True)
+        serializer = GetBusSerializer(bus, many=True)
         return Response(
             serializer.data, status=status.HTTP_200_OK
         ) 
@@ -57,7 +57,7 @@ class BusDetailView(APIView):
 class CommuteView(APIView):
     def get(self, request, format=None): 
         commute = Commute.objects.all() 
-        serializer = CommuteSerializer(commute, many=True)
+        serializer = GetCommuteSerializer(commute, many=True)
         return Response(
             serializer.data, status=status.HTTP_200_OK
         ) 
@@ -79,7 +79,7 @@ class CommuteDetailView(APIView):
 
     def get(self, request, pk, format=None):
         commute = self.get_object(pk) 
-        serializer = CommuteSerializer(commute)
+        serializer = GetCommuteSerializer(commute)
         return Response(
             serializer.data, status=status.HTTP_200_OK
         ) 

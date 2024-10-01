@@ -10,7 +10,7 @@ class Bus(models.Model):
     plate_number = models.CharField(max_length=15, unique=True)
     manufacturer = models.CharField(max_length=100, blank=True, null=True)
     model = models.CharField(max_length=100, blank=True, null=True)
-    year = models.DateField(null=True)
+    year = models.CharField(max_length=5, null=True)
     color = models.CharField(max_length=55, blank=True, null=True)
     sit_capacity = models.IntegerField()
     driver = models.ForeignKey(
@@ -22,7 +22,7 @@ class Bus(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Bus {self.plate_number} - Driver: {self.driver_name}"
+        return f"Bus {self.plate_number} - Driver: {self.driver}"
 
 
 class Commute(models.Model):
@@ -32,15 +32,15 @@ class Commute(models.Model):
         Bus,
         on_delete=models.CASCADE,
     )
-    student = models.ManyToManyField(Student, related_name="commutes")
+    students = models.ManyToManyField(Student, related_name="commutes")
 
     @property
     def is_full(self):
-        return self.bus.sit_capacity == self.student.count()
+        return self.bus.sit_capacity == self.students.count()
 
     def add_student(self, student):
         if not self.is_full:
-            self.student.add(student)
+            self.students.add(student)
         else:
             raise ValidationError(f"{self.bus.plate_number} is full.")
 

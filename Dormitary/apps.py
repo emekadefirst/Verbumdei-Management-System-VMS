@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class HostelmanagementConfig(AppConfig):
+class DormitaryConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'hostelmanagement'
+    name = 'Dormitary'
