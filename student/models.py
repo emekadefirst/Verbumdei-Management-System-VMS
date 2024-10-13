@@ -51,6 +51,7 @@ class Student(models.Model):
         ordering = ['-registration_date']
 
     def __str__(self):
-        return f'{self.last_name} - {self.registration_id}'
+        fullname = f"{self.first_name} {self.last_name} {self.other_name}"
+        return fullname
 
 

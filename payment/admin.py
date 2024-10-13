@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import PaymentType, Payment
+from .models import PaymentType, Payment, PhysicalPayment
 from unfold.admin import ModelAdmin
 from import_export.admin import ImportExportModelAdmin
 from unfold.contrib.import_export.forms import ImportForm, SelectableFieldsExportForm
@@ -7,11 +7,11 @@ from unfold.contrib.import_export.forms import ImportForm, SelectableFieldsExpor
 
 @admin.register(PaymentType)
 class PaymentTypeAdmin(ModelAdmin, ImportExportModelAdmin):
-    list_display = ["name", "amount"]
+    list_display = ["payment_name", "amount"]
     search_fields = [
-        "name",
+        "payment_name",
     ]
-    ordering = ["name"]
+    ordering = ["payment_name"]
     import_form_class = ImportForm
     export_form_class = SelectableFieldsExportForm
 
@@ -20,7 +20,7 @@ class PaymentTypeAdmin(ModelAdmin, ImportExportModelAdmin):
 class PaymentAdmin(ModelAdmin, ImportExportModelAdmin):
     list_display = ["payment_type", "student", "method", "status", "reference", "created_at"]
     search_fields = [
-        "payment_type__name",
+        "payment_type__payment_name",
         "student__first_name",
         "student__last_name",
         "status",
@@ -32,9 +32,31 @@ class PaymentAdmin(ModelAdmin, ImportExportModelAdmin):
     export_form_class = SelectableFieldsExportForm
 
 
-# vb20827pa15
-# VD20240827155323
-# First Term School Fee
-# Cash
+class PhysicalPaymentAdmin(admin.ModelAdmin):
+    list_display = [
+        "id",
+        "student",
+        "term",
+        "payment_name",
+        "amount_paid",
+        "balance",
+        "status",
+        "payment_id",
+        "transaction_id",
+        "time",
+        "method",
+    ]
+    list_filter = ["status", "method", "term", "student"]
+    search_fields = ["student__registration_id", "payment_id", "transaction_id"]
+    ordering = ["-time"]
+    readonly_fields = [
+        "payment_id",
+        "balance",
+        "time",
+        "id"
+    ] 
+    import_form_class = ImportForm
+    export_form_class = SelectableFieldsExportForm 
 
-{"parent": "vb20827pa15", "payment_type": "First Term School Fee", "student": "VD20240827155323", "method": "Online"}
+
+admin.site.register(PhysicalPayment, PhysicalPaymentAdmin)
