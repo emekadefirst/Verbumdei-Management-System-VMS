@@ -28,14 +28,24 @@ class StudentSerializer(serializers.ModelSerializer):
             "upload",
             "img_url",
             "class_assigned",
+            "registration_date",
         ]
-
-        read_only_fields = ("id", "registration_id", "registration_date", "profile_image")
+        read_only_fields = (
+            "id",
+            "registration_id",
+            "registration_date",
+            "profile_image",
+        )
 
     def validate_parent(self, value):
-        try:
-            return Parent.objects.get(parent_name=value)
-        except Parent.DoesNotExist:
+        parents = Parent.objects.filter(parent_name=value)
+        if parents.exists():
+            if parents.count() > 1:
+                raise serializers.ValidationError(
+                    f"Multiple parents found with the name '{value}'."
+                )
+            return parents.first()  # Return the first Parent instance
+        else:
             raise serializers.ValidationError(
                 f"Parent with name '{value}' does not exist."
             )
@@ -51,11 +61,12 @@ class StudentSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         parent = validated_data.pop("parent")
         class_assigned = validated_data.pop("class_assigned")
-        return Student.objects.create(
+
+        # Make sure to assign a single Parent instance
+        student = Student.objects.create(
             parent=parent, class_assigned=class_assigned, **validated_data
         )
-        
+        return student
+
     def update(self, instance, validated_data):
         return super().update(instance, validated_data)
-
-

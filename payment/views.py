@@ -111,7 +111,7 @@ class TotalTuitionForMonth(APIView):
             percentage_change = (0)
         response_data = {
             "total_tuition_for_current_month": f"₦{current_month_payments:,.2f}",
-            "percentage_change": f"{percentage_change:+.2f}% than last month",
+            "percentage_change": f"{percentage_change:+.2f}%",
         }
 
         return Response(response_data)

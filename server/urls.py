@@ -44,6 +44,7 @@ urlpatterns = [
     path("dormitary/", include("Dormitary.urls")),
     path("transport/", include("transport.urls")),
     path("term/", include("term.urls")),
+    path("result/", include("result.urls")),
 ]
 if settings.DEBUG == False:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

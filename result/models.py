@@ -39,7 +39,7 @@ class Result(models.Model):
         super().save(*args, **kwargs)
         
     def __str__(self):
-        return self.student
+        return self.student.registration_id
     
     
 
