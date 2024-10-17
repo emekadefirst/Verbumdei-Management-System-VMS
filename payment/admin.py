@@ -7,9 +7,12 @@ from unfold.contrib.import_export.forms import ImportForm, SelectableFieldsExpor
 
 @admin.register(PaymentType)
 class PaymentTypeAdmin(ModelAdmin, ImportExportModelAdmin):
-    list_display = ["payment_name", "amount"]
+    list_display = ["id", "title", "payment_name", "grade", "term", "amount", "created_at"]
     search_fields = [
         "payment_name",
+        "title",
+        "grade",
+        "term",
     ]
     ordering = ["payment_name"]
     import_form_class = ImportForm
@@ -36,7 +39,6 @@ class PhysicalPaymentAdmin(admin.ModelAdmin):
     list_display = [
         "id",
         "student",
-        "term",
         "payment_name",
         "amount_paid",
         "balance",
@@ -46,7 +48,7 @@ class PhysicalPaymentAdmin(admin.ModelAdmin):
         "time",
         "method",
     ]
-    list_filter = ["status", "method", "term", "student"]
+    list_filter = ["status", "method", "student"]
     search_fields = ["student__registration_id", "payment_id", "transaction_id"]
     ordering = ["-time"]
     readonly_fields = [

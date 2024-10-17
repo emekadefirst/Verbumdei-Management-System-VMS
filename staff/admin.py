@@ -8,8 +8,8 @@ from unfold.contrib.import_export.forms import ImportForm, SelectableFieldsExpor
 @admin.register(Staff)
 class StaffAdmin(ModelAdmin, ImportExportModelAdmin):
     list_display = ('staff_id', 'first_name', 'last_name', 'email', 'staff_type', 'employment_type', 'status')
-    search_fields = ('staff_id', 'first_name', 'last_name', 'email', 'phone_number_1', 'nin', 'bvn')
-    list_filter = ('staff_type', 'employment_type', 'status', 'gender', 'created_at')
+    search_fields = ('staff_id', 'first_name', 'last_name', 'email', 'phone_number_1', 'nin')
+    list_filter = ('staff_type', 'employment_type', 'status', 'gender', 'created_at', 'position', 'religion')
     ordering = ('-created_at',)
     readonly_fields = ('staff_id', 'created_at')
     

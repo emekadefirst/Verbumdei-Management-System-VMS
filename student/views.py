@@ -8,9 +8,13 @@ from .models import *
 from django.db.models import Q
 from django.db.models.functions import Lower
 from .serializers import StudentSerializer
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import TokenAuthentication
 
 
 class StudentView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self, request, format=None):
         student = Student.objects.all()
         serializer = StudentSerializer(student, many=True, context={"request": request})
@@ -25,6 +29,8 @@ class StudentView(APIView):
 
 
 class StudentDetailView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def get_object(self, pk):
         try:
             return Student.objects.get(pk=pk)
@@ -46,6 +52,8 @@ class StudentDetailView(APIView):
 
 
 class StudentCountView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self, request, format=None):
         count = Student.objects.count()
         return Response({"count": count})
@@ -68,5 +76,3 @@ class StudentSearch(APIView):
             return Response(serializer.data)
         else:
             return Response("Invalid search query", status=status.HTTP_400_BAD_REQUEST)
-
-

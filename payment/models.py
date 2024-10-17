@@ -3,7 +3,7 @@ from student.models import Student
 from parent.models import Parent
 from datetime import datetime
 from term.models.term import Term
-
+from grade.models import Class
 
 def generate_payment_id():
     now = datetime.now()
@@ -13,11 +13,24 @@ def generate_payment_id():
 
 
 class PaymentType(models.Model):
+    id = models.AutoField(primary_key=True)
+    title = models.CharField(max_length=150, null=True, blank=True)
     payment_name = models.CharField(max_length=150)
+    grade = models.ForeignKey(Class, on_delete=models.CASCADE)
+    term = models.ForeignKey(Term, on_delete=models.CASCADE)
     amount = models.FloatField()
+    created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        ordering = ["-created_at"]
+
+    def save(self, *args, **kwargs):
+        if self.term and self.grade:
+            self.title = f"{self.payment_name} {self.grade.name} {self.term.name}"
+
+        super().save(*args, **kwargs)
     def __str__(self):
-        return self.payment_name
+        return self.title
 
 
 class PhysicalPayment(models.Model):
@@ -70,8 +83,8 @@ class PhysicalPayment(models.Model):
 
     def __str__(self):
         return self.student.registration_id
-    
-    
+
+
 class Payment(models.Model):
     class PAYMENT_METHOD(models.TextChoices):
         ONLINE = "ONLINE", "online"

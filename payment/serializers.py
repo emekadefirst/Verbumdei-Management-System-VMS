@@ -2,13 +2,16 @@ from rest_framework import serializers
 from student.models import Student
 from parent.models import Parent
 from term.models.term import Term
+from grade.models import Class
 from .models import Payment, PaymentType, PhysicalPayment
 
 
 class PaymentTypeSerializer(serializers.ModelSerializer):
+    term = serializers.SlugRelatedField(slug_field="name", queryset=Term.objects.all())
+    grade = serializers.SlugRelatedField(slug_field="name", queryset=Term.objects.all())
     class Meta:
         model = PaymentType
-        fields = "__all__"
+        fields = ["id", "title", "term", "grade", "payment_name", "amount", "created_at"]
 
     def create(self, validated_data):
         parent = PaymentType.objects.create(**validated_data)
@@ -72,13 +75,19 @@ class TermSerializer(serializers.ModelSerializer):
         model = Term
         fields = ["name"]
 
+
+class ClassSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Class
+        fields = ["name"]
+
+
 class StudentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student
         fields = ["first_name", "last_name", "other_name", "registration_id", "img_url"]
 
 class GetPhysicalPaymentSerializer(serializers.ModelSerializer):
-    term = TermSerializer() 
     student = StudentSerializer()
     payment_name = PaymentTypeSerializer()
     class Meta:
@@ -87,19 +96,41 @@ class GetPhysicalPaymentSerializer(serializers.ModelSerializer):
 
 
 class MakePhysicalPaymentSerializer(serializers.ModelSerializer):
-    payment_name = serializers.SlugRelatedField(slug_field="payment_name", queryset=PaymentType.objects.all())
-    student = serializers.SlugRelatedField(slug_field="registration_id", queryset=Student.objects.all())
+    payment_name = serializers.SlugRelatedField(
+        slug_field="payment_name", queryset=PaymentType.objects.all()
+    )
+    student = serializers.SlugRelatedField(
+        slug_field="registration_id", queryset=Student.objects.all()
+    )
     term = serializers.SlugRelatedField(slug_field="name", queryset=Term.objects.all())
+    transaction_id = serializers.CharField(required=False, allow_blank=True)
 
     class Meta:
         model = PhysicalPayment
         fields = [
-            "payment_name", 
+            "payment_name",
             "student",
             "term",
             "amount_paid",
             "method",
+            "transaction_id",
         ]
+
+    def validate(self, data):
+        method = data.get("method")
+        transaction_id = data.get("transaction_id")
+        if method in [PhysicalPayment.METHOD.POS, PhysicalPayment.METHOD.TRANSFER]:
+            if not transaction_id:
+                raise serializers.ValidationError(
+                    "Transaction ID is required for POS and Transfer payments."
+                )
+
+        if method == PhysicalPayment.METHOD.CASH and transaction_id:
+            raise serializers.ValidationError(
+                "Transaction ID should not be provided for Cash payments."
+            )
+
+        return data
 
     def create(self, validated_data):
         payment = PhysicalPayment.objects.create(**validated_data)

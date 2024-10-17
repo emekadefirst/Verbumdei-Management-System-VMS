@@ -4,6 +4,7 @@ from staff.models import Staff
 from server.cloud import cloud_doc, cloud
 from io import BytesIO
 from django.utils.text import slugify
+from student.models import Student
 from django.contrib.auth.models import AbstractUser
 
 
@@ -11,7 +12,13 @@ class Class(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=12, unique=True)
     teacher = models.OneToOneField(Staff, on_delete=models.CASCADE, limit_choices_to={'staff_type': 'TEACHING'})
+    students = models.ManyToManyField(Student)
     created_at = models.DateTimeField(auto_now_add=True)
+    
+    @property
+    def student_count(self):
+        return self.students.count()
+    
     
     def clean(self):
         if self.teacher.staff_type != 'TEACHING':

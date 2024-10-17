@@ -6,13 +6,12 @@ from grade.models import Class
 
 class StudentSerializer(serializers.ModelSerializer):
     parent = serializers.CharField(max_length=25)
-    class_assigned = serializers.CharField(max_length=12)
 
     class Meta:
         model = Student
         fields = [
             "id",
-            "registration_id",  # Add this field to the serializer
+            "registration_id",  
             "first_name",
             "other_name",
             "last_name",
@@ -27,7 +26,6 @@ class StudentSerializer(serializers.ModelSerializer):
             "religion",
             "upload",
             "img_url",
-            "class_assigned",
             "registration_date",
         ]
         read_only_fields = (
@@ -60,11 +58,9 @@ class StudentSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         parent = validated_data.pop("parent")
-        class_assigned = validated_data.pop("class_assigned")
-
         # Make sure to assign a single Parent instance
         student = Student.objects.create(
-            parent=parent, class_assigned=class_assigned, **validated_data
+            parent=parent, **validated_data
         )
         return student
 

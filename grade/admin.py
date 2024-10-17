@@ -5,7 +5,7 @@ from import_export.admin import ImportExportModelAdmin
 from unfold.contrib.import_export.forms import ImportForm, SelectableFieldsExportForm
 
 class ClassAdmin(ModelAdmin, ImportExportModelAdmin):
-    list_display = ('name', 'teacher', 'created_at')
+    list_display = ("name", "teacher", "student_count", "created_at")
     search_fields = ('name', 'teacher__first_name', 'teacher__last_name')
     list_filter = ('created_at',)
     ordering = ('-created_at',)

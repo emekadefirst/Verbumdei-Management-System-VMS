@@ -6,6 +6,7 @@ from .models import Payment, PaymentType, PhysicalPayment
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from student.models import Student
 from .serializers import PaymentSerializers, PaymentTypeSerializer, GetPhysicalPaymentSerializer, MakePhysicalPaymentSerializer
 
 
@@ -80,24 +81,47 @@ class PhysicalPaymentView(APIView):
 
 class TotalPayment(APIView):
     def get(self, request, format=None):
-        data = PhysicalPayment.objects.all()
-        total_payment = sum(payment.amount_paid for payment in data)
-        return Response({"total_payment": total_payment})
+        total_physical_payment = (
+            PhysicalPayment.objects.aggregate(total=Sum("amount_paid"))["total"] or 0
+        )
+        total_payment = (
+            Payment.objects.aggregate(total=Sum("payment_type__amount"))["total"] or 0
+        )
+
+        total = total_physical_payment + total_payment
+        return Response({"total_payment": total})
+
+
+
 
 
 class TotalTuitionForMonth(APIView):
     def get(self, request, format=None):
-        now = datetime.now()
-        first_day_current_month = now.replace(day=1)
+        current_time = datetime.now()
+        first_day_current_month = current_time.replace(day=1)
         last_day_previous_month = first_day_current_month - timedelta(days=1)
         first_day_previous_month = last_day_previous_month.replace(day=1)
-        current_month_payments = (
+
+        current_month_physical_payments = (
             PhysicalPayment.objects.filter(
-                time__year=now.year, time__month=now.month
+                time__year=current_time.year, time__month=current_time.month
             ).aggregate(total_amount=Sum("amount_paid"))["total_amount"]
             or 0
         )
-        previous_month_payments = (
+        current_month_online_payments = (
+            Payment.objects.filter(
+                created_at__year=current_time.year, created_at__month=current_time.month
+            ).aggregate(total_amount=Sum("payment_type__amount"))["total_amount"]
+            or 0
+        )
+
+        # Sum of physical and online payments for the current month
+        total_current_month_payments = (
+            current_month_physical_payments + current_month_online_payments
+        )
+
+        # Get total physical payments for the previous month
+        previous_month_physical_payments = (
             PhysicalPayment.objects.filter(
                 time__year=last_day_previous_month.year,
                 time__month=last_day_previous_month.month,
@@ -105,13 +129,48 @@ class TotalTuitionForMonth(APIView):
             or 0
         )
 
-        if previous_month_payments > 0:
-            percentage_change = ((current_month_payments - previous_month_payments) / previous_month_payments) * 100
+        # Get total online payments for the previous month
+        previous_month_online_payments = (
+            Payment.objects.filter(
+                created_at__year=last_day_previous_month.year,
+                created_at__month=last_day_previous_month.month,
+            ).aggregate(total_amount=Sum("payment_type__amount"))["total_amount"]
+            or 0
+        )
+
+        # Sum of physical and online payments for the previous month
+        total_previous_month_payments = (
+            previous_month_physical_payments + previous_month_online_payments
+        )
+
+        # Calculate the percentage change
+        if total_previous_month_payments > 0:
+            percentage_change = (
+                (total_current_month_payments - total_previous_month_payments)
+                / total_previous_month_payments
+            ) * 100
         else:
-            percentage_change = (0)
+            percentage_change = 0
+
+        # Format the response data
         response_data = {
-            "total_tuition_for_current_month": f"₦{current_month_payments:,.2f}",
+            "total_tuition_for_current_month": f"₦{total_current_month_payments:,.2f}",
             "percentage_change": f"{percentage_change:+.2f}%",
         }
 
         return Response(response_data)
+
+
+class StudentPaymentHistory(APIView):
+    def get(self, request, registration_id):
+        try:
+            student = Student.objects.get(registration_id=registration_id)
+        except Student.DoesNotExist:
+            return Response({"detail": "Student not found"}, status=status.HTTP_404_NOT_FOUND)
+        payments = PhysicalPayment.objects.filter(student=student)
+        
+        if payments.exists():
+            serializer = GetPhysicalPaymentSerializer(payments, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        
+        return Response({"detail": "No payments found for the student"}, status=status.HTTP_404_NOT_FOUND)
