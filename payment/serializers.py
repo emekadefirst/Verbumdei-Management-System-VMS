@@ -8,10 +8,11 @@ from .models import Payment, PaymentType, PhysicalPayment
 
 class PaymentTypeSerializer(serializers.ModelSerializer):
     term = serializers.SlugRelatedField(slug_field="name", queryset=Term.objects.all())
-    grade = serializers.SlugRelatedField(slug_field="name", queryset=Term.objects.all())
+    grade = serializers.SlugRelatedField(slug_field="name", queryset=Class.objects.all())
     class Meta:
         model = PaymentType
         fields = ["id", "title", "term", "grade", "payment_name", "amount", "created_at"]
+        read_only_field = ["id", "title", "created_at"]
 
     def create(self, validated_data):
         parent = PaymentType.objects.create(**validated_data)

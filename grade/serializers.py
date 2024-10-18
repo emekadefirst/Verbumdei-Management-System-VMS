@@ -31,6 +31,11 @@ class ClassSerializer(serializers.ModelSerializer):
     class Meta:
         model = Class
         fields = ["id", "name", "teacher", "students", "student_count", "created_at"]
+        read_only_fields = (
+            "id",
+            "created_at",
+            "student_count",
+        )
 
 
 class SubjectSerializer(serializers.ModelSerializer):
@@ -44,6 +49,8 @@ class SubjectSerializer(serializers.ModelSerializer):
 
 
 class SubjectCreateUpdateSerializer(serializers.ModelSerializer):
+    teacher = serializers.SlugRelatedField(slug_field='staff_id', queryset=Staff.objects.all())
+    grade = serializers.SlugRelatedField(slug_field='name', queryset=Class.objects.all())
     class Meta:
         model = Subject
         fields = ['id', 'name', 'grade', 'teacher']

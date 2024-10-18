@@ -1,6 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from student.models import Student
 from django.shortcuts import get_object_or_404
 from .models import Class, Subject, SubjectMaterial
 from .serializers import (
@@ -8,6 +9,28 @@ from .serializers import (
     SubjectSerializer, SubjectCreateUpdateSerializer,
     SubjectMaterialSerializer
 )
+
+
+class ClassAddStudentsAPIView(APIView):
+    def patch(self, request, pk):
+        class_instance = get_object_or_404(Class, pk=pk)
+        new_students = request.data.get("students", [])
+
+        if not new_students:
+            return Response(
+                {"detail": "No students provided."}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        for student_id in new_students:
+            print(f"Processing student_id: {student_id}")  # Debugging line
+            student = get_object_or_404(Student, pk=student_id)
+            class_instance.students.add(student)
+
+        class_instance.save()
+        return Response(
+            {"detail": "Students added successfully."}, status=status.HTTP_200_OK
+        )
+
 
 class ClassListCreateAPIView(APIView):
     def get(self, request):
@@ -99,5 +122,3 @@ class SubjectMaterialRetrieveUpdateDestroyAPIView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-

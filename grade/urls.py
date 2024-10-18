@@ -3,6 +3,7 @@ from .views import *
 
 urlpatterns = [
     path('classes/', ClassListCreateAPIView.as_view(), name='class-list-create'),
+    path('patch/<int:pk>/', ClassAddStudentsAPIView.as_view(), name='class-retrieve-update-destroy'),
     path('classes/<int:pk>/', ClassRetrieveUpdateDestroyAPIView.as_view(), name='class-retrieve-update-destroy'),
     path('subjects/', SubjectListCreateAPIView.as_view(), name='subject-list-create'),
     path('subjects/count/', SubjectCount.as_view(), name='subject-list-create'),
