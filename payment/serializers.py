@@ -98,7 +98,7 @@ class GetPhysicalPaymentSerializer(serializers.ModelSerializer):
 
 class MakePhysicalPaymentSerializer(serializers.ModelSerializer):
     payment_name = serializers.SlugRelatedField(
-        slug_field="payment_name", queryset=PaymentType.objects.all()
+        slug_field="title", queryset=PaymentType.objects.all()
     )
     student = serializers.SlugRelatedField(
         slug_field="registration_id", queryset=Student.objects.all()

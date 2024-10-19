@@ -41,6 +41,11 @@ class ParentDetailView(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def delete(self, request, pk):
+        parent = self.get_object(pk)
+        parent.delete()
+
+
 class ParentCountView(APIView):
     def get(self, request, format=None):
         count = Parent.objects.count()

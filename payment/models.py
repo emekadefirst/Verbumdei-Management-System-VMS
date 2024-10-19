@@ -14,8 +14,8 @@ def generate_payment_id():
 
 class PaymentType(models.Model):
     id = models.AutoField(primary_key=True)
-    title = models.CharField(max_length=150, null=True, blank=True)
-    payment_name = models.CharField(max_length=150)
+    title = models.CharField(max_length=1000, null=True, blank=True, unique=True)
+    payment_name = models.CharField(max_length=255)
     grade = models.ForeignKey(Class, on_delete=models.CASCADE)
     term = models.ForeignKey(Term, on_delete=models.CASCADE)
     amount = models.FloatField()
