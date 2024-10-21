@@ -92,9 +92,6 @@ class TotalPayment(APIView):
         return Response({"total_payment": total})
 
 
-
-
-
 class TotalTuitionForMonth(APIView):
     def get(self, request, format=None):
         current_time = datetime.now()
@@ -168,9 +165,60 @@ class StudentPaymentHistory(APIView):
         except Student.DoesNotExist:
             return Response({"detail": "Student not found"}, status=status.HTTP_404_NOT_FOUND)
         payments = PhysicalPayment.objects.filter(student=student)
-        
+
         if payments.exists():
             serializer = GetPhysicalPaymentSerializer(payments, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        
+
         return Response({"detail": "No payments found for the student"}, status=status.HTTP_404_NOT_FOUND)
+
+
+class TotalDeptTheMonthView(APIView):
+    def get(self, request, format=None):
+        # Get the current time
+        current_time = datetime.now()
+
+        # Get the first day of the current month
+        first_day_current_month = current_time.replace(day=1)
+
+        # Get the last day of the previous month
+        last_day_previous_month = first_day_current_month - timedelta(days=1)
+
+        # Get the first day of the previous month
+        first_day_previous_month = last_day_previous_month.replace(day=1)
+
+        # Get total outstanding balance for the current month
+        current_month_debt = (
+            PhysicalPayment.objects.filter(
+                time__year=current_time.year,
+                time__month=current_time.month,
+                balance__gt=0,
+            ).aggregate(total_debt=Sum("balance"))["total_debt"]
+            or 0
+        )
+
+        # Get total outstanding balance for the previous month
+        previous_month_debt = (
+            PhysicalPayment.objects.filter(
+                time__year=last_day_previous_month.year,
+                time__month=last_day_previous_month.month,
+                balance__gt=0,
+            ).aggregate(total_debt=Sum("balance"))["total_debt"]
+            or 0
+        )
+
+        # Calculate the percentage change compared to the previous month
+        if previous_month_debt > 0:
+            percentage_change = (
+                (current_month_debt - previous_month_debt) / previous_month_debt
+            ) * 100
+        else:
+            percentage_change = 0
+
+        # Prepare the response data
+        response_data = {
+            "total_debt_for_current_month": f"₦{current_month_debt:,.2f}",
+            "percentage_change": f"{percentage_change:+.2f}%",
+        }
+
+        return Response(response_data)

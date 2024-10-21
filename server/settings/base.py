@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     "teacheradmin",
     "term",
     "studentattendance",
-    "Dormitary",
+    # "Dormitary",
     "transport",
     "result",
 ]

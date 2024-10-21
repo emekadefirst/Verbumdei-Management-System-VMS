@@ -4,7 +4,7 @@ from .models import Event, Exam, Mid_Exam
 class EventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
-        fields = ['id', 'name', 'date']
+        fields = ["id", "name", "date", "created_at"]
         readonly = ["id", "created_at"]
 
 class ExamSerializer(serializers.ModelSerializer):
