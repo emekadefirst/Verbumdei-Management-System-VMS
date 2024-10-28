@@ -3,7 +3,7 @@ from student.models import Student
 from .models import Attendance
 from staff.models import Staff
 from rest_framework import status
-from teacheradmin.models import TeacherAdmin
+from customuser.models import CustomUser
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
@@ -15,7 +15,7 @@ class CreateAttendanceView(APIView):
     def post(self, request, staff_id, format=None):
         serializer = AttendanceSerializer(data=request.data)
         if serializer.is_valid():
-            teacher = get_object_or_404(TeacherAdmin, teacher_id=staff_id)
+            teacher = get_object_or_404(CustomUser, person_id=staff_id)
             confirm_if_staff = get_object_or_404(Staff, staff_id=staff_id)
             assigned_class = get_object_or_404(Class, teacher=confirm_if_staff)
             if teacher and confirm_if_staff and assigned_class:
@@ -76,7 +76,7 @@ class AttendanceByStudent(APIView):
 
 class UpdateAttendanceView(APIView):
     def put(self, request, staff_id, format=None):
-        teacher = get_object_or_404(TeacherAdmin, teacher_id=staff_id)
+        teacher = get_object_or_404(CustomUser, person_id=staff_id)
         student_id = request.data.get("registration_id")
         if not student_id:
             return Response(

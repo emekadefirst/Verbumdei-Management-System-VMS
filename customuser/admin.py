@@ -1,36 +1,27 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import SubAdmin
+from .models import CustomUser
 
 
-
-class SubAdminAdmin(UserAdmin):
+class CustomUserAdmin(UserAdmin):
+    # Define the fields to be displayed in the list view
     list_display = (
         "username",
-        "first_name",
-        "last_name",
         "email",
-        "staff_id",
-        "created_at",
+        "role",
+        "person_id",
         "is_staff",
+        "is_active",
+        "date_joined",
     )
+    list_filter = ("role", "is_staff", "is_active")
 
-    list_filter = ("is_staff", "is_superuser", "is_active", "staff_id")
-
-    search_fields = (
-        "username",
-        "first_name",
-        "last_name",
-        "email",
-        "admin_id",
-        "staff__staff_id",
-    )
-
+    # Define the fields to be included in the detail view
     fieldsets = (
         (None, {"fields": ("username", "password")}),
         (
             "Personal info",
-            {"fields": ("first_name", "last_name", "email", "admin_id", "staff_id")},
+            {"fields": ("first_name", "last_name", "email", "role", "person_id")},
         ),
         (
             "Permissions",
@@ -47,6 +38,7 @@ class SubAdminAdmin(UserAdmin):
         ("Important dates", {"fields": ("last_login", "date_joined")}),
     )
 
+    # Define the fields to be included in the create and edit forms
     add_fieldsets = (
         (
             None,
@@ -54,24 +46,22 @@ class SubAdminAdmin(UserAdmin):
                 "classes": ("wide",),
                 "fields": (
                     "username",
-                    "first_name",
-                    "last_name",
                     "email",
                     "password1",
                     "password2",
-                    "staff",
-                    "is_active",
+                    "role",
+                    "person_id",
                     "is_staff",
-                    "is_superuser",
+                    "is_active",
                 ),
             },
         ),
     )
 
+    # Set the ordering of users in the admin list
     ordering = ("username",)
+    search_fields = ("username", "email", "first_name", "last_name", "person_id")
 
-    # Displays the field for staff association in the admin form
-    def staff(self, obj):
-        return obj.staff.staff_id if obj.staff else None
 
-admin.site.register(SubAdmin, SubAdminAdmin)
+# Register the CustomUser model with the CustomUserAdmin class
+admin.site.register(CustomUser, CustomUserAdmin)

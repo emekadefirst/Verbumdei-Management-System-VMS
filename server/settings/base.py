@@ -38,11 +38,13 @@ INSTALLED_APPS = [
     "asessment",
     "inventory",
     "payment",
-    "subadmin",
-    "teacheradmin",
+    "customuser",
+    # "subadmin",
+    # "teacheradmin",
     "term",
     "studentattendance",
-    # "Dormitary",
+    "library",
+    "Dormitary",
     "transport",
     "result",
 ]
@@ -84,12 +86,12 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Ensure email addresses are unique
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
+    "customuser.backend.CustomBackend",
 ]
 
-AUTH_USER_MODEL = "subadmin.SubAdmin"  
+AUTH_USER_MODEL = "customuser.CustomUser" 
 
 
 LANGUAGE_CODE = 'en-us'
@@ -149,7 +151,8 @@ UNFOLD = {
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.TokenAuthentication",
-        "rest_framework.authentication.BasicAuthentication",
-        "rest_framework.authentication.SessionAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.AllowAny",  
     ],
 }

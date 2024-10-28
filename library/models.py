@@ -34,7 +34,7 @@ class Book(models.Model):
     author = models.CharField(max_length=250)
     isbn = models.CharField(max_length=100, unique=True)
     copies = models.PositiveIntegerField()
-    category = models.ForeignKey(BookCategory, on_delete=models.SET_NULL)
+    category = models.ForeignKey(BookCategory, on_delete=models.CASCADE)
     shelf = models.ForeignKey(Shelf, on_delete=models.SET_NULL, null=True)  
     created_at = models.DateTimeField(auto_now_add=True)
 
