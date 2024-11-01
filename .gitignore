@@ -4,8 +4,6 @@ __pycache__/
 app.py
 verbumdeiMS.db
 run.sh
-quiz/
-verbumdeiMS.db
 main.py
 media/
 index.html
