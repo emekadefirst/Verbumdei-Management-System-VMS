@@ -7,7 +7,7 @@ from customuser.models import CustomUser
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
-from .serializers import AttendanceSerializer
+from .serializers import AttendanceSerializer, GetAttendanceSerializer
 from datetime import date
 
 
@@ -40,7 +40,7 @@ class CreateAttendanceView(APIView):
 class AllAttendanceView(APIView):
     def get(self, request):
         attendance = Attendance.objects.all()
-        serializer = AttendanceSerializer(attendance, many=True)
+        serializer = GetAttendanceSerializer(attendance, many=True)
         return Response(serializer.data)
 
 
@@ -50,7 +50,7 @@ class AttendanceByClassView(APIView):
         assigned_class = Class.objects.filter(teacher=teacher).first() 
         if assigned_class:
             attendance_records = Attendance.objects.filter(grade=assigned_class)
-            serializer = AttendanceSerializer(attendance_records, many=True)
+            serializer = GetAttendanceSerializer(attendance_records, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(
@@ -64,7 +64,7 @@ class AttendanceByStudent(APIView):
         student = get_object_or_404(Student, registration_id=student_id)
         attendance_records = Attendance.objects.filter(student=student)
         total_attendance = sum(record.count for record in attendance_records)
-        serializer = AttendanceSerializer(attendance_records, many=True)
+        serializer = GetAttendanceSerializer(attendance_records, many=True)
         return Response(
             {
                 "attendance_records": serializer.data,

@@ -1,8 +1,14 @@
+import uuid
 from django.db import models
 from django.utils import timezone
 from student.models import Student
 from grade.models import Subject
+from term.models.term import Term
+from django.db.models import Sum
 
+
+def exam_code():
+    return f"OT{str(uuid.uuid4())[:8]}"
 
 
 class Quiz(models.Model):
@@ -11,16 +17,23 @@ class Quiz(models.Model):
         CONTINUOUS_ASSESSMENT = "CONTINUOUS_ASSESSMENT", "Continuous assessment"
     id = models.AutoField(primary_key=True)
     type = models.CharField(max_length=25, choices=QUIZ_TYPE.choices)
-    subject = models.ForeignKey(Subject, on_delete=models.CASCADE, blank=True, null=True) 
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE, blank=True, null=True)
+    name = models.CharField(max_length=55, null=True, blank=True) 
     created_at = models.DateTimeField(auto_now_add=True)
-    time_limit = models.IntegerField(null=True, blank=True, help_text="Time limit in minutes")
-    is_active = models.BooleanField(default=True)
+    
+    def save(self, *args, **kwargs):
+        if self.subject:
+            self.name = self.subject.name
+        super().save(*args, **kwargs)
 
-
+    class Meta:
+        ordering = ['-created_at']
+        
     def __str__(self):
         return f"{self.subject.name} {self.type}"
 
 class Question(models.Model):
+    id = models.AutoField(primary_key=True)
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name='questions')
     text = models.TextField()
 
@@ -34,63 +47,91 @@ class Option(models.Model):
     is_correct = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.text
+        return self.question
 
-class QuizAttempt(models.Model):
-    STATUS_CHOICES = [
-        ('in_progress', 'In Progress'),
-        ('completed', 'Completed'),
-        ('timed_out', 'Timed Out'),
-    ]
-    
-    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+
+class QuizSession(models.Model):
+    class Status(models.TextChoices):
+        NOT_STARTED = "NOT STARTED", "Not Started"
+        ONGOING = "ONGOING", "Ongoing"
+        ENDED = "ENDED", "Ended"
+    id = models.AutoField(primary_key=True)
+    students = models.ManyToManyField(Student)
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
-    score = models.IntegerField(default=0)
-    start_time = models.DateTimeField(auto_now_add=True)
-    completed_at = models.DateTimeField(null=True, blank=True)
+    start_time = models.DateTimeField()
+    end_time = models.DateTimeField()
+    term = models.ForeignKey(Term, on_delete=models.CASCADE)
+    code = models.CharField(max_length=30, default=exam_code, unique=True)
     duration = models.IntegerField(null=True, blank=True)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='in_progress')
-
-    def __str__(self):
-        return f"{self.student} - {self.quiz.title}"
-
-    def calculate_score(self):
-        correct_answers = self.answers.filter(selected_option__is_correct=True).select_related('question')
-        total_points = sum(answer.question.points for answer in correct_answers)
-        max_points = sum(question.points for question in self.quiz.questions.all())
-        self.score = total_points
-        self.save()
-        return {
-            'score': self.score,
-            'total': max_points,
-            'percentage': (self.score / max_points) * 100 if max_points > 0 else 0
-        }
-
-    def is_time_limit_exceeded(self):
-        if self.quiz.time_limit:
-            time_spent = (timezone.now() - self.start_time).total_seconds() / 60
-            return time_spent > self.quiz.time_limit
-        return False
-
-    def complete_attempt(self):
-        self.status = 'completed'
-        self.completed_at = timezone.now()
-        self.save()
-
-    def time_out_attempt(self):
-        self.status = 'timed_out'
-        self.completed_at = timezone.now()
-        self.save()
-        
-        
-
-class StudentAnswer(models.Model):
-    quiz_attempt = models.ForeignKey(QuizAttempt, on_delete=models.CASCADE, related_name='answers')
-    question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    selected_option = models.ForeignKey(Option, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return f"{self.quiz_attempt.student.registration_id} - {self.question.text}"
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.NOT_STARTED)
 
     class Meta:
-        unique_together = ['quiz_attempt', 'question']
+        ordering = ['-start_time']
+    def __str__(self):
+        return self.code
+
+    def is_time_limit_exceeded(self):
+        if self.end_time == timezone.now():
+            raise ValueError("Session Time out, reschedule")
+        return self
+
+
+class StudentResponse(models.Model):
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    session = models.ForeignKey(QuizSession, on_delete=models.CASCADE, related_name="answers")
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    selected_option = models.ForeignKey(Option, on_delete=models.CASCADE)
+    score = models.PositiveIntegerField(default=0)
+
+    def save(self, *args, **kwargs):
+        if self.student in self.session:
+            correct_option = self.question.options.filter(is_correct=True).first()
+            if correct_option and self.selected_option == correct_option:
+                self.score = 1
+            else:
+                self.score = 0
+            raise ValueError(f"This student wasn't assigned for the test {self.session.students}")
+        super().save(*args, **kwargs)
+
+    class Meta:
+        unique_together = ['session', 'question', 'selected_option']
+
+
+class Result(models.Model):
+    id = models.AutoField(primary_key=True)
+    session = models.ForeignKey(QuizSession, on_delete=models.CASCADE)
+    response = models.ForeignKey(StudentResponse, on_delete=models.CASCADE)
+    correct = models.PositiveIntegerField(default=0, null=True, blank=True)
+    failed = models.PositiveIntegerField(default=0, null=True, blank=True)
+    total_questions = models.PositiveIntegerField(default=0, null=True, blank=True)
+    percentage = models.PositiveIntegerField(default=0, null=True, blank=True)
+
+    @classmethod
+    def calculate_result(cls, student, session):
+        responses = StudentResponse.objects.filter(student=student, session=session)
+
+        total_questions = responses.count()
+        correct = responses.filter(score=1).count()
+        failed = total_questions - correct if total_questions else 0
+        percentage = (correct / total_questions * 100) if total_questions > 0 else 0
+
+        result, _ = cls.objects.update_or_create(
+            session=session,
+            response__student=student,
+            defaults={
+                'correct': correct,
+                'failed': failed,
+                'total_questions': total_questions,
+                'percentage': percentage
+            }
+        )
+        return result
+
+    @property
+    def quiz_name(self):
+        return self.session.quiz.name
+
+    @property
+    def student(self):
+        full_name = f"{self.response.student.first_name} {self.response.student.last_name}"
+        return full_name

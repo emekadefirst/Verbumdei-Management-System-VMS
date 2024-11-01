@@ -17,9 +17,10 @@ class CustomUser(AbstractUser):
         PARENT = "PARENT", "Parent"
         ACCOUNTANT = "ACCOUNTANT", "Accountant"
         ADMIN = "ADMIN", "Admin"
+        MANAGER = "MANAGER", "Manager"
 
     role = models.CharField(max_length=20, choices=ROLE.choices, default=ROLE.ADMIN)
-    person_id = models.CharField(max_length=30, null=True, blank=True)
+    person_id = models.CharField(max_length=30, null=True, blank=True, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

@@ -16,6 +16,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DEBUG = True
 
 INSTALLED_APPS = [
+    "unfold.contrib.import_export",
+    "import_export",
     "unfold",
     "django.contrib.admin",
     "django.contrib.auth",
@@ -25,7 +27,6 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # packages
     "drf_yasg",
-    "import_export",
     "rest_framework",
     "corsheaders",
     "rest_framework.authtoken",
@@ -39,8 +40,6 @@ INSTALLED_APPS = [
     "inventory",
     "payment",
     "customuser",
-    # "subadmin",
-    # "teacheradmin",
     "term",
     "studentattendance",
     "library",
@@ -137,7 +136,7 @@ UNFOLD = {
             "950": "0 0 25",
         }
     },
-    "DASHBOARD_CALLBACK": "server.utils.dashboard_callback",  # Move this out of COLORS
+    "DASHBOARD_CALLBACK": "server.utils.dashboard_callback",
     "SITE_FAVICONS": [
         {
             "rel": "icon",

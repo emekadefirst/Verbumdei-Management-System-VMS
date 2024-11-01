@@ -1,10 +1,12 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.validators import ValidationError
 from .permissions import IsAccountant, IsHeadTeacher, IsParent, IsTeacher
 from .models import CustomUser
 from staff.models import Staff
 from parent.models import Parent
+from .backend import CustomBackend
 from django.contrib.auth import authenticate, login, logout
 from rest_framework.authtoken.models import Token
 from .serializers import UserSerializer
@@ -24,62 +26,49 @@ class SignupView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.exceptions import ValidationError
+from django.contrib.auth import authenticate
+from rest_framework.authtoken.models import Token
+from .models import CustomUser
+from .serializers import UserSerializer
+
 
 class LoginView(APIView):
     def post(self, request, format=None):
         person_id = request.data.get("person_id")
         password = request.data.get("password")
 
-        if not person_id:
+        # Check if both credentials are provided
+        if not person_id or not password:
             return Response(
-                {"error": "ID is required."}, status=status.HTTP_400_BAD_REQUEST
-            )
-        if not password:
-            return Response(
-                {"error": "Password is required."}, status=status.HTTP_400_BAD_REQUEST
+                {"error": "Please provide both person_id and password"},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
-        try:
-            user = CustomUser.objects.get(person_id=person_id)
-            profile_image = None
+        # Authenticate user using Django's authenticate method
+        user = authenticate(request, person_id=person_id, password=password)
 
-            try:
-                staff_profile = Staff.objects.get(staff_id=person_id)
-                profile_image = staff_profile.img_url
-            except Staff.DoesNotExist:
-                try:
-                    parent_profile = Parent.objects.get(code=person_id)
-                    profile_image = parent_profile.img_url
-                except Parent.DoesNotExist:
-                    return Response(
-                        {"error": "Invalid credentials, please try again."},
-                        status=status.HTTP_400_BAD_REQUEST,
-                    )
-
-            # Authenticate user with person_id and password
-            user = authenticate(username=user.username, password=password)
-            if not user:
-                return Response(
-                    {"error": "Invalid credentials, please try again."},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-
-            login(request, user)
-
-            serializer = UserSerializer(user)
-            user_data = serializer.data
-            user_data["profile_image"] = profile_image or None
-            token, created = Token.objects.get_or_create(user=user)
-            return Response(
-                {"token": token.key, "user": user_data, "message": "Login successful"},
-                status=status.HTTP_200_OK,
-            )
-
-        except CustomUser.DoesNotExist:
+        if user is None:
             return Response(
                 {"error": "Invalid credentials, please try again."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+
+        # Get or create the token
+        token, created = Token.objects.get_or_create(user=user)
+
+        # Serialize user data
+        serializer = UserSerializer(user)
+        user_data = serializer.data
+        user_data["profile_image"] = getattr(user, "profile_image", None)
+
+        return Response(
+            {"token": token.key, "user": user_data, "message": "Login successful"},
+            status=status.HTTP_200_OK,
+        )
 
 
 class LogoutView(APIView):
