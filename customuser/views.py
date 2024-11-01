@@ -26,14 +26,6 @@ class SignupView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.exceptions import ValidationError
-from django.contrib.auth import authenticate
-from rest_framework.authtoken.models import Token
-from .models import CustomUser
-from .serializers import UserSerializer
 
 
 class LoginView(APIView):

@@ -33,3 +33,12 @@ class IsAccountant(BasePermission):
             request.user.role == CustomUser.ROLE.ACCOUNTANT and
             request.user.has_perm('customuser.manage_inventories')
         )
+
+
+class IsManager(BasePermission):
+    def has_permission(self, request, view):
+        return (
+            request.user.is_authenticated
+            and request.user.role == CustomUser.ROLE.MANAGER
+            and request.user.has_perm("customuser.manage_inventory")
+        )

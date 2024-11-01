@@ -32,8 +32,6 @@ class CustomUser(AbstractUser):
             ("manage_inventories", "Can manage inventories"),
         ]
 
-
-
     def save(self, *args, **kwargs):
         if self.person_id:
             try:
