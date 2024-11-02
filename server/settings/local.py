@@ -15,14 +15,25 @@ ALLOWED_HOSTS = []
 #     }
 # }
 
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql",
+#         "NAME": os.environ.get("DATABASE_NAME"),
+#         "USER": os.environ.get("DATABASE_USER"),
+#         "PASSWORD": os.environ.get("DATABASE_PASSWORD"),
+#         "HOST": os.environ.get("DATABASE_HOST"),
+#         "PORT": 5432,
+#         "OPTIONS": {"sslmode": "require"},
+#     }
+# }
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ.get("DATABASE_NAME"),
-        "USER": os.environ.get("DATABASE_USER"),
-        "PASSWORD": os.environ.get("DATABASE_PASSWORD"),
-        "HOST": os.environ.get("DATABASE_HOST"),
-        "PORT": 5432,
+        "NAME": "koyebdb",
+        "USER": "koyeb-adm",
+        "PASSWORD": "ghCavbYw54IP",
+        "HOST": "ep-bitter-math-a2fo0js2.eu-central-1.pg.koyeb.app",
         "OPTIONS": {"sslmode": "require"},
     }
 }
