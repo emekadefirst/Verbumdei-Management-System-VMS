@@ -1,15 +1,10 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.validators import ValidationError
 from .permissions import IsAccountant, IsHeadTeacher, IsParent, IsTeacher
-from .models import CustomUser
-from staff.models import Staff
-from parent.models import Parent
-from .backend import CustomBackend
 from django.contrib.auth import authenticate, login, logout
 from rest_framework.authtoken.models import Token
-from .serializers import UserSerializer
+from .serializers import UserSerializer, LoginSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.authentication import TokenAuthentication
 
@@ -26,41 +21,26 @@ class SignupView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-
-
 class LoginView(APIView):
-    def post(self, request, format=None):
-        person_id = request.data.get("person_id")
-        password = request.data.get("password")
-
-        # Check if both credentials are provided
-        if not person_id or not password:
-            return Response(
-                {"error": "Please provide both person_id and password"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        # Authenticate user using Django's authenticate method
-        user = authenticate(request, person_id=person_id, password=password)
-
-        if user is None:
-            return Response(
-                {"error": "Invalid credentials, please try again."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        # Get or create the token
-        token, created = Token.objects.get_or_create(user=user)
-
-        # Serialize user data
-        serializer = UserSerializer(user)
-        user_data = serializer.data
-        user_data["profile_image"] = getattr(user, "profile_image", None)
-
-        return Response(
-            {"token": token.key, "user": user_data, "message": "Login successful"},
-            status=status.HTTP_200_OK,
-        )
+    def post(self, request):
+        serializer = LoginSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.validated_data["user"]
+            token, created = Token.objects.get_or_create(user=user)  
+            response_data = {
+                "token": token.key,  
+                "user_id": user.id,
+                "role": user.role,
+                "username": user.username,
+                "person_id": user.person_id,
+                "email": user.email 
+            } 
+            if user.first_name:
+                response_data["first_name"] = user.first_name
+            if user.last_name:
+                response_data["last_name"] = user.last_name
+            return Response({"detail": "Login sucessful"}, response_data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class LogoutView(APIView):
