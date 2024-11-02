@@ -13,7 +13,7 @@ adminv2.
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-DEBUG = True
+DEBUG = False
 
 INSTALLED_APPS = [
     "unfold.contrib.import_export",

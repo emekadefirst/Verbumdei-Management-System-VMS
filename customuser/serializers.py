@@ -49,7 +49,13 @@ class UserSerializer(serializers.ModelSerializer):
                 email = staff.email
                 username = userId(first_name.lower())
         except Staff.DoesNotExist:
-            raise serializers.ValidationError({"error": "Staff ID does not exist"})
+            try:
+                parent = Parent.objects.get(code=self.person_id)
+                self.username = userId(parent.parent_name)
+            except Parent.DoesNotExist:
+                raise ValueError(
+                    "Invalid `person_id`: no matching `Staff` or `Parent` found"
+                )
 
         validated_data["first_name"] = first_name
         validated_data["last_name"] = last_name
