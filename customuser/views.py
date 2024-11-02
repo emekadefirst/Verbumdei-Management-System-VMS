@@ -39,7 +39,7 @@ class LoginView(APIView):
                 response_data["first_name"] = user.first_name
             if user.last_name:
                 response_data["last_name"] = user.last_name
-            return Response({"detail": "Login sucessful"}, response_data, status=status.HTTP_200_OK)
+            return Response(response_data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
