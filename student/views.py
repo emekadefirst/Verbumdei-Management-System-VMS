@@ -76,3 +76,12 @@ class StudentSearch(APIView):
             return Response(serializer.data)
         else:
             return Response("Invalid search query", status=status.HTTP_400_BAD_REQUEST)
+
+
+class StudentByParent(APIView):
+    def get(self, request, parent_id: int):
+        students = Student.objects.filter(parent=parent_id)
+        if not students.exists():
+            return Response({"detail": "No students found for this parent code."}, status=status.HTTP_404_NOT_FOUND)
+        serializer = StudentSerializer(students, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

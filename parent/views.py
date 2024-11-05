@@ -53,8 +53,7 @@ class ParentCountView(APIView):
 
 
 class ParentDashboard(APIView):
-    def post(self, request, format=None):
-        code = request.data.get("code")
+    def get(self, request, code: str):
         try:
             parent = Parent.objects.get(
                 code=code

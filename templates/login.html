@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Login Notification</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-6">
+    <div class="max-w-md w-full bg-white rounded-lg shadow-lg overflow-hidden">
+        <div class="bg-blue-500 text-white py-4 px-6">
+            <h2 class="text-2xl font-bold">Login Notification</h2>
+        </div>
+        <div class="p-6 space-y-4">
+            <p class="text-gray-700">Dear {{ user_name }},</p>
+            <p class="text-gray-700">A new login was detected on your account at {{ time }}.</p>
+            <div class="bg-gray-100 p-4 rounded-md">
+                <p class="text-gray-700">
+                    Role: {{ role }}<br>
+                    IP Address: {{ ip_address }}
+                </p>
+            </div>
+            <p class="text-gray-700">If this wasn't you, please contact the IT department immediately.</p>
+            <div class="mt-4 text-center">
+                <a href="mailto:info@verbunddiacademy.com"
+                    class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-300">
+                    Review Account Activity
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
