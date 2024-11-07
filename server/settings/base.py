@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "Dormitary",
     "transport",
     "result",
+    "announcement",
 ]
 
 ROOT_URLCONF = 'server.urls'
@@ -160,6 +161,8 @@ REST_FRAMEWORK = {
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = "verbumdei85@gmail.com "
-EMAIL_HOST_PASSWORD = "dqlc wuio lyzu ugsk"
+EMAIL_USE_TLS = True  # Changed to True
+EMAIL_HOST_USER = "emekadefirst@gmail.com"
+EMAIL_HOST_PASSWORD = "pzrz urxv epvt gybj"
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+EMAIL_TIMEOUT = 20

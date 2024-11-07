@@ -1,5 +1,8 @@
 from django.http import Http404
 from .models import Parent
+from django.core.mail import send_mail
+from server.settings.base import EMAIL_HOST_USER, EMAIL_HOST, EMAIL_PORT, EMAIL_HOST_PASSWORD, EMAIL_USE_TLS
+
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -8,18 +11,52 @@ from student.models import Student
 from student.serializers import StudentSerializer
 
 
+from django.core.mail import get_connection, EmailMessage
+from django.conf import settings
+
+
 class ParentView(APIView):
     def get(self, request, format=None):
         parnet = Parent.objects.all()
         serializer = ParentSerializer(parnet, many=True)
         return Response(serializer.data)
-    
+
     def post(self, request, format=None):
         serializer = ParentSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            user = serializer.save()
+
+            try:
+                # Create connection with custom timeout
+                connection = get_connection(
+                    host=EMAIL_HOST,
+                    port=EMAIL_PORT,
+                    username=EMAIL_HOST_USER,
+                    password=EMAIL_HOST_PASSWORD,
+                    use_tls=EMAIL_USE_TLS,
+                    timeout=20,
+                )
+
+                # Create email message
+                email = EmailMessage(
+                    subject="Welcome to Verbumdei",
+                    body=f"Thank you for joining the family! Here is your ID: sdsfdfdfsd",
+                    from_email=EMAIL_HOST_USER,
+                    to=["victorchibuogwu66@gmail.com"],
+                    connection=connection,
+                )
+
+                # Send email
+                email.send(fail_silently=False)
+
+            except Exception as e:
+                print(f"Failed to send email: {str(e)}")
+                # You might want to log this error properly
+                # Log the error but don't prevent user creation
+
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class ParentDetailView(APIView):
     def get_object(self, pk):
