@@ -45,6 +45,7 @@ urlpatterns = [
     path("term/", include("term.urls")),
     path("result/", include("result.urls")),
     path("announcement/", include("announcement.urls")),
+    path("voucher/", include("voucher.urls")),
 ]
 if settings.DEBUG == False:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

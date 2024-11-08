@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "transport",
     "result",
     "announcement",
+    "voucher",
 ]
 
 ROOT_URLCONF = 'server.urls'
