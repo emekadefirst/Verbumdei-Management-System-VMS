@@ -40,7 +40,7 @@ urlpatterns = [
     path("asessment/", include("asessment.urls")),
     path("user/", include("customuser.urls")),
     path("attendance/", include("studentattendance.urls")),
-    # path("dormitary/", include("Dormitary.urls")),
+    path("dormitary/", include("Dormitary.urls")),
     path("transport/", include("transport.urls")),
     path("term/", include("term.urls")),
     path("result/", include("result.urls")),
