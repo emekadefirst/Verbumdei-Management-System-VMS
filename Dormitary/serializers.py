@@ -20,7 +20,7 @@ class StaffSerializer(serializers.ModelSerializer):
         return value
 
 
-class HostelSerializer(serializers.Serializer):
+class HostelSerializer(serializers.ModelSerializer):
     type = serializers.ChoiceField(choices=["MALE", "FEMALE"])
     warden = serializers.CharField(max_length=25)
 

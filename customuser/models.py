@@ -12,6 +12,7 @@ class CustomUser(AbstractUser):
         ACCOUNTANT = "ACCOUNTANT", "Accountant"
         ADMIN = "ADMIN", "Admin"
         MANAGER = "MANAGER", "Manager"
+        SECRETARY = "SECRETARY", "Secretary"
 
     role = models.CharField(max_length=20, choices=ROLE.choices, default=ROLE.ADMIN)
     person_id = models.CharField(max_length=30,  unique=True)

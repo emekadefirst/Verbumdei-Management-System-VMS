@@ -42,3 +42,12 @@ class IsManager(BasePermission):
             and request.user.role == CustomUser.ROLE.MANAGER
             and request.user.has_perm("customuser.manage_inventory")
         )
+
+
+class IsSecretary(BasePermission):
+    def has_permission(self, request, view):
+        return (
+            request.user.is_authenticated
+            and request.user.role == CustomUser.ROLE.SECRETARY
+            and request.user.has_perm("customuser.view_student_reports")
+        )

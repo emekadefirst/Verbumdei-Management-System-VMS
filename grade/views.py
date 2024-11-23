@@ -122,3 +122,10 @@ class SubjectMaterialRetrieveUpdateDestroyAPIView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class SubjectByTeacher(APIView):
+    def get(self, request, staff_id):
+        subject = Subject.objects.get(teacher=staff_id)
+        serializer = SubjectMaterialSerializer(subject)
+        return Response(serializer.data, status=status.HTTP_200_OK)
